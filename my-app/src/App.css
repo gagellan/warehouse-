@@ -1,0 +1,1568 @@
+/* ================= NAVBAR CSS ================= */
+
+.navbar {
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  /* background: rgba(0, 0, 0, 0.5); Transparent background */
+  background: #0056b3;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Ensure the navbar is above other content */
+}
+
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 1831px; /* Adjust based on your layout */
+}
+
+.navbar-logo {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-decoration: none;
+  flex: 1; /* Pushes other elements away */
+}
+
+.navbar-links {
+  display: flex;
+  gap: 30px;  /* Adjust spacing between links */
+  flex: 2;
+  justify-content: center; /* Center the links */
+}
+
+.navbar-link {
+  color: white;
+  font-size: 18px;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.navbar-link:hover {
+  color: #ff5733; /* Change color on hover */
+}
+
+.navbar-login {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end; /* Push the login link to the right */
+}
+
+.navbar-login .navbar-link {
+  font-size: 30px;
+}
+
+/* ================= CONTACT US PAGE CSS ================= */
+
+/* General Reset */
+.contact-container * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Main Container */
+.contact-container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background: url('./background-image.jpg') no-repeat center center/cover;
+  color: white;
+  padding: 20px;
+  padding-top: 80px; /* Add padding to avoid overlap with navbar */
+}
+
+/* Content Box */
+.contact-container .content {
+  background: rgba(0, 0, 0, 0.6);
+  padding: 40px;
+  border-radius: 10px;
+  max-width: 800px;
+}
+
+/* Headline */
+.contact-container h1 {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+}
+
+/* Paragraph */
+.contact-container p {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+/* Buttons */
+.contact-container .buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+/* Common Button Styles */
+.contact-container .btn {
+  padding: 9px 25px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
+  width: 150px; /* Set a fixed width for both buttons */
+  text-align: center;
+}
+
+/* Demo Button */
+.contact-container .demo-btn {
+  background-color: #0056b3;
+  border: 2px solid #0056b3;
+  color: white;
+}
+
+/* Trial Button */
+.contact-container .trial-btn {
+  background-color: transparent;
+  border: 2px solid white;
+  color: white;
+}
+
+/* Hover Effects */
+.contact-container .demo-btn:hover {
+  background-color: #357ab8;
+}
+
+.contact-container .trial-btn:hover {
+  background-color: white;
+  color: black;
+}
+
+/* ================= DEMO PAGE CSS ================= */
+
+/* General Reset */
+.demo-container * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+/* Main Container */
+.demo-container {
+  /* min-height: 100vh; */
+  height: 99vh; /* Allows the container to grow based on its content */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-image: url('./pixelcut-export (1).jpg');
+  /* padding: 20px; */
+  clear: both;  /* Ensures nothing overlaps */
+  overflow: hidden; 
+  padding-bottom: 10px; /* Adjust the value as needed */
+}
+
+.sample-demo-c {
+  background: rgba(0, 0, 0, 0.5 );
+  /* width: 80%; */
+  width: 1940px;
+  min-height: 1060px;
+  padding: 40px;
+  border-radius: 10px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.content-wrapper {
+  display: flex;
+  gap: 30px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.content, .form-container {
+  flex: 1;
+  min-width: 300px;
+  max-width: 500px;
+}
+
+/* Heading */
+.demo-container h1 {
+  font-size: 2rem;
+  color: #ffffff;
+  margin-bottom: 20px;
+}
+
+/* Layout for Two Boxes */
+.demo-container .content-wrapper {
+  display: flex;
+  gap: 30px;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 1200px;
+}
+
+/* Content Box */
+.demo-container .content {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: left;
+}
+
+.demo-container .content h2 {
+  font-size: 1.4rem;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.demo-container .content ul {
+  padding-left: 20px;
+}
+
+.demo-container .content ul li {
+  margin-bottom: 10px;
+  font-size: 1rem;
+  color: #555;
+}
+
+/* Form Box */
+.demo-container .form-container {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Form Styles */
+.demo-container .demo-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.demo-container .demo-form input,
+.demo-container .demo-form select,
+.demo-container .demo-form textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+  background: #fff;
+  color: #333;
+}
+
+/* Phone Input */
+.demo-container .phone-container {
+  display: flex;
+  gap: 10px;
+}
+
+.demo-container .phone-container select {
+  width: 40%;
+}
+
+.demo-container .phone-container input {
+  width: 60%;
+}
+
+/* Checkbox Alignment */
+.demo-container .checkbox-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.demo-container .checkbox-container input[type="checkbox"] {
+  margin-top: 3px;
+  width: 16px;
+  height: 16px;
+}
+
+/* Button */
+.demo-container .btn {
+  padding: 12px 25px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+/* Primary Button */
+.demo-container .demo-btn {
+  background-color:  #0056b3;
+  color: white;
+}
+
+.demo-container .demo-btn:hover {
+  background-color: #357ab8;
+}
+
+/* ================= FREE TRIAL PAGE CSS ================= */
+
+/* General Reset */
+.trial-container * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+/* Main Container */
+.trial-container {
+  height: 240vh;
+  /* height: auto; */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* Align content to the top */
+  align-items: center;
+  background: #eef1f6;
+  padding: 20px;
+  overflow-y: auto; /* Enable scrolling */
+}
+
+/* Heading */
+.trial-container h1 {
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+/* Layout */
+.trial-container .content-wrapper {
+  display: flex;
+  gap: 30px;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 1200px;
+  flex-wrap: wrap; /* Ensures responsiveness */
+  overflow-y: auto; /* Add scrolling if needed */
+  max-height: 80vh; /* Restrict height to enable scrolling */
+}
+
+/* Content Box */
+.trial-container .content {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: left;
+}
+
+.trial-container .content h2 {
+  font-size: 1.4rem;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.trial-container .content ul {
+  padding-left: 20px;
+}
+
+.trial-container .content ul li {
+  margin-bottom: 10px;
+  font-size: 1rem;
+  color: #555;
+}
+
+/* Form */
+.trial-container .form-container {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  max-height: 500px; /* Set height to allow scrolling */
+  overflow-y: auto;
+}
+
+.trial-container .trial-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 400px; /* Set a limit */
+  overflow-y: auto; /* Allow scrolling */
+}
+
+.trial-container .trial-form input,
+.trial-container .trial-form select,
+.trial-container .trial-form textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+  background: #fff;
+  color: #333;
+}
+
+/* Button */
+.trial-container .btn {
+  padding: 12px 25px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+/* Primary Button */
+.trial-container .trial-btn {
+  background-color: #ff5733;
+  color: white;
+}
+
+.trial-container .trial-btn:hover {
+  background-color: #cc4628;
+}
+
+/* Free Trial Image Styling */
+.demo-container img {
+  max-width: 60%;
+  height: 300px;
+  margin: 10px auto;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* ================= PLAN PAGE CSS ================= */
+
+/* General Styles */
+.plan-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* width: 100vw; */
+  height: 100vh; /* Full height */
+  flex-direction: column;
+  text-align: center;
+  background-color: transparent;
+  /* padding: 50px 30px; */
+}
+
+.plan-pricing-container {
+  /* background: linear-gradient(135deg, #dbeafe, #b7d0ec); */
+  padding: 50px;
+  border-radius: 15px;
+  width: 1500px; /* Increased width */
+  /* width: 95%; */
+  /* height: 1000px; */
+}
+
+.plan-pricing-container h1 {
+  font-size: 40px;
+  font-weight: 700;
+  color: #333;
+}
+
+.plan-pricing-container p {
+  font-size: 28px;
+  color: #666;
+}
+
+/* Toggle Switch */
+.plan-toggle-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20px 0;
+  
+}
+
+.plan-toggle-container .toggle-label {
+  font-weight: bold;
+  margin: 0 10px;
+  font-size: 24px;
+  color: #333;
+}
+
+.plan-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 25px;
+}
+
+.plan-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.plan-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 25px;
+}
+
+.plan-switch input:checked + .plan-slider {
+  background-color: #4CAF50;
+}
+
+.plan-slider::before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 4px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+.plan-switch input:checked + .plan-slider::before {
+  transform: translateX(25px);
+}
+
+/* Pricing Boxes */
+.plan-plans {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.plan-box {
+  /* background: linear-gradient(135deg, #a8bdd9, #d4e3f3); */
+  padding: 30px; /* Slightly increased padding */
+  border-radius: 10px;
+  text-align: center;
+  width: 500px;
+  height: 550px;
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+  border-top: 10px solid transparent;
+  /* Centering contents */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.plan-box h2 {
+  font-size: 40px; /* Increased from 18px */
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 15px;
+}
+
+.plan-price {
+  font-size: 500px; /* Increased from 50px */
+  font-weight: bold;
+  color: black;
+  margin: 15px 0;
+}
+
+.plan-price span {
+  font-size: 30px; /* Slightly smaller for "/mo" or "/yr" */
+  /* font-weight: normal; */
+  color: #555;
+}
+
+
+.plan-discount {
+  font-size: 22px;
+  color: green;
+  margin-bottom: 10px;
+}
+
+.plan-features {
+  list-style: none;
+  padding: 0;
+  /* font-size: 14px; */
+  color: #333;
+  text-align: center; /* Center align list content */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Ensures all list items are centered */
+  justify-content: center;
+  font-size: 25px;
+}
+
+.plan-features li {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* Align text to the left */
+  width: 100%;
+  gap: 10px; /* Creates spacing between icon and text */
+}
+
+
+.plan-features li::before {
+  content: "✔";
+  color: #28a745;
+  font-weight: bold;
+  min-width: 20px; /* Ensures icons align properly */
+  text-align: center;
+}
+
+.plan-features .plan-disabled::before {
+  content: "✖";
+  color: red;
+  min-width: 20px;
+  text-align: center;
+}
+
+.plan-subscribe {
+  background-color: #0056b3;
+  color: white;
+  border: none;
+  /* padding: 12px 20px; */
+  margin-top: 15px;
+  cursor: pointer;
+  border-radius: 5px;
+  /* font-size: 20px; */
+  width: 400px;
+  height: 65px;
+  font-weight: bold;
+  font-size: 22px; /* Make button text larger */
+  padding: 9px 24px;
+}
+
+.plan-subscribe:hover {
+  background-color: #0056b3;
+}
+
+/* ================= LOGIN PAGE CSS ================= */
+
+/* Reset Styles */
+.login-container * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+/* Main Container */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f0f4f8;
+}
+
+/* Login Card */
+.login-card {
+  display: flex;
+  /* width: 90%; */
+  /* width: 2200px; */
+  max-width: 1550px;
+  height: 90vh;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Left Section */
+.login-left-section {
+  flex: 1.5;
+  position: relative;
+}
+
+.login-background-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Right Section */
+.login-right-section {
+  flex: 1;
+  background-color: #0056b3;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  position: relative;
+  color: white;
+  text-decoration: none;
+}
+
+.login-right-section h1 {
+  font-size: 40px;
+}
+
+/* Top Navigation Links */
+.login-top-links {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 30px;
+}
+
+.login-top-links a {
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: bold;
+  padding: 8px 15px;
+  border-radius: 20px;
+  transition: 0.3s ease-in-out;
+  color: #080808;
+}
+
+.login-top-links a.active {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+/* Form Styling */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 410px;
+  /* max-width: 350px; */
+}
+
+.login-input-box {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+/* Button */
+.login-btn-primary {
+  padding: 10px;
+  background-color: #FFD700;
+  color: black;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.login-btn-primary:hover {
+  background-color: #F1C40F;
+}
+
+/* Sign-up Text */
+.login-signup-text {
+  margin-top: 20px;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.login-signup-text a {
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.login-signup-text a:hover {
+  text-decoration: underline;
+}
+
+/* ================= DASHBOARD NAVBAR CSS ================= */
+
+.dashboardnav-sidebar {
+  height: 100%;
+  width: 240px;
+  background-color: #1c4e80;
+  padding: 0;
+  margin: 0;
+  position: fixed;
+  top: 0;
+  left: -290px; /* Hide sidebar initially */
+  width: 250px;
+  height: 100%;
+  background-color: #1c4e80;
+  color: white;
+  padding: 20px;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  transition: left 0.3s ease;
+}
+
+.dashboardnav-sidebar.open {
+  left: 0; /* Show sidebar when open */
+}
+
+.dashboardnav-SidebarList {
+  padding: 0;
+  height: auto;
+  width: 100%;
+}
+
+.dashboardnav-SidebarList .dashboardnav-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: 100%;
+  height: 50px;
+  text-decoration: none;
+  font-family: Arial, sans-serif;
+  color: rgb(240, 235, 235);
+  font-size: 20px;
+  margin: 0%;
+  align-items: center;
+}
+
+.dashboardnav-SidebarList .dashboardnav-row:hover {
+  cursor: pointer;
+  background-color: #012953;
+}
+
+.dashboardnav-SidebarList #dashboardnav-active {
+  background-color: #2b78c4;
+}
+
+.dashboardnav-row #dashboardnav-icon {
+  flex: 10%;
+  display: grid;
+  place-items: center;
+}
+
+.dashboardnav-row #dashboardnav-title {
+  flex: 70%;
+}
+
+.dashboardnav-sidebar-logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 10px;
+  box-sizing: border-box;
+}
+
+.dashboardnav-sidebar-logo img {
+  max-width: 90%;
+  max-height: 90%;
+  object-fit: contain;
+}
+
+/* Nested List */
+.dashboardnav-nested-list {
+  list-style-type: none;
+  padding-left: 20px;
+  background-color: #1c4e80;
+  transition: all 0.3s ease-in-out;
+}
+
+.dashboardnav-nested-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  font-size: 18px;
+  color: rgb(240, 235, 235);
+  cursor: pointer;
+  height: 30px;
+}
+
+.dashboardnav-nested-icon {
+  margin-right: 10px;
+}
+
+/* Dropdown Arrow */
+#dashboardnav-arrow {
+  margin-left: -17px;
+  transition: transform 0.3s ease;
+}
+
+#dashboardnav-arrow.dashboardnav-rotate {
+  transform: rotate(180deg);
+}
+
+/* Top Navbar */
+.dashboardnav-top-navbar {
+  /* margin-left: 240px; */
+  padding: 14px;
+  height: 33px;
+  background-color: #1c4e80;
+  border-bottom: 1px solid #ccc;
+}
+
+.dashboardnav-top-navbar h1 {
+  margin: 0;
+  font-size: 24px;
+  color: #ffffff;
+}
+
+/* ================= DASHBOARD PAGE CSS ================= */
+
+.dashboard {
+  margin-top: 30px;
+  margin-left: 120px;
+  max-width: 1600px;
+  padding: 30px;
+}
+
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  margin-bottom: 30px;
+  justify-content: center;
+}
+
+.card {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  flex: 1;
+  width: 160px;
+  height: 150px;
+  /* min-width: 150px; */
+  text-align: center;
+}
+
+.card h2,
+.card h3 {
+  margin: 15px 0;
+  color: #334050;
+  font-size: 24px;
+}
+
+.red-text {
+  color: #d9534f;
+  font-size: 20px;
+}
+
+.blue-text {
+  color: #5bc0de;
+  font-size: 20px;
+}
+
+.charts {
+  margin-top: 100px;
+  display: flex;
+  gap: 90px;
+  justify-content: center;
+}
+
+.chart-container {
+  flex: 1;
+  background: white;
+  border-radius: 10px;
+  padding: 30px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 700px;
+  min-width: 300px;
+}
+
+.chart-container h2 {
+  font-size: 22px;
+  margin-bottom: 20px;
+}
+
+/* ================= IMAGES PAGE CSS ================= */
+
+.image-dashboard {
+  padding: 20px;
+}
+
+.image-dashboard-header {
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  color: #ffffff;
+  padding: 10px;
+  background-color: #222;
+  border-bottom: 2px solid #444;
+}
+
+.image-camera-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.image-camera-row {
+  display: flex;
+  justify-content: space-around;
+}
+
+.image-camera-card {
+  position: relative;
+  width: 150px;
+  height: 100px;
+  background: #333;
+  border: 2px solid black;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.image-camera-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-timestamp {
+  position: absolute;
+  bottom: 5px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  font-size: 12px;
+  padding: 3px 5px;
+  border-radius: 3px;
+}
+
+.image-tag {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  padding: 3px 6px;
+  font-size: 10px;
+  font-weight: bold;
+  color: white;
+  border-radius: 3px;
+}
+
+.image-tag-0 { background: red; }
+.image-tag-1 { background: green; }
+.image-tag-2 { background: blue; }
+.image-tag-3 { background: orange; }
+
+/* ================= COMPARE IMAGES PAGE CSS ================= */
+
+.compareimages-container {
+  padding: 20px;
+  text-align: center;
+}
+
+.compareimages-form-container {
+  display: flex;
+  flex-direction: row;
+  gap: 40px;
+  margin-left: 360px;
+}
+
+.compareimages-input-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  width: 200px;
+}
+
+.compareimages-input-group label {
+  font-weight: bold;
+}
+
+.react-datepicker-wrapper {
+  width: 100%;
+}
+
+.react-datepicker__input-container input {
+  width: 100%;
+  padding: 8px;
+  font-size: 16px;
+}
+
+.compareimagesbtn {
+  margin-top: 25px;
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #334050;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  max-height: 40px;
+}
+
+.compareimages-input-group select {
+  width: 100%;
+  padding: 8px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.compareimages-input-group select:focus {
+  outline: none;
+  border-color: #334050;
+}
+
+button:hover {
+  background-color: #293846;
+}
+
+.compareimages-overlaycard {
+  display: flex;
+  justify-content: center;
+  /* padding: 20px 60px 150px 60px; */
+  height: 720px;
+  width: 1400px;
+  margin-left: 240px;
+}
+
+
+/* ================= VEHICLE DASHBOARD PAGE CSS ================= */
+
+
+.vehicle-dashboard {
+  display: flex;
+  flex-direction: column;
+  padding: 1vw;
+  background: white;
+  border-radius: 10px;
+}
+
+.vehicle-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #add8e6;
+  padding: 10px 15px;
+  border-radius: 10px;
+}
+
+.vehicle-logo img {
+  width: 50px;
+}
+
+.vehicle-search-bar {
+  width: 40%;
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.vehicle-icons i {
+  margin: 0 10px;
+  cursor: pointer;
+  font-size: 1.5vw;
+  color: white;
+}
+
+/* Stats Section */
+.vehicle-stats {
+  display: flex;
+  justify-content: space-around;
+  margin: 1vw 0;
+  gap: 1vw;
+}
+
+.vehicle-stat-box {
+  background: white;
+  padding: 1vw;
+  box-shadow: 0 0.2vw 1vw rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  width: 20%;
+  text-align: center;
+  font-size: 18px;
+}
+
+/* Vehicle Info */
+.vehicle-info {
+  display: flex;
+  gap: 1vw;
+}
+
+.vehicle-image-grid img {
+  width: 15vw;
+  height: 11vw;
+  border-radius: 5px;
+  padding: 8px;
+}
+
+.vehicle-list {
+  width: 65%;
+}
+
+.vehicle-search {
+  width: 97%;
+  padding: 0.8vw;
+  margin-bottom: 1vw;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* Table */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 0.8vw;
+  border: 1px solid #ddd;
+}
+
+.vehicle-status {
+  padding: 0.5vw 0.8vw;
+  border-radius: 5px;
+  color: white;
+}
+
+.vehicle-status.registered { background: green; }
+.vehicle-status.unregistered { background: red; }
+.vehicle-status.active { background: green; }
+.vehicle-status.inactive { background: red;}
+
+
+/* ================= TOP NAVBAR CSS ================= */
+
+/* Add styles for the top navbar, user info, and side menu */
+
+.top-navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 20px;
+  background-color: #1c4e80;
+  color: white;
+  height: 47px;
+}
+
+.top-navbar h1 {
+  padding-left: 228px;
+  font-size: 30px;
+}
+
+.top-navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  /* margin-left: 1360px */
+}
+
+.navbar-icon {
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.navbar-profile {
+  display: flex;
+  align-items: center;
+  background: #1c4e80;
+  padding: 5px 10px;
+  border-radius: 5px;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.navbar-email {
+  font-size: 17px;
+  color: white;
+}
+
+.navbar-email-icon {
+  font-size: 21px;
+  color: white;
+  padding-top: 4px;
+}
+
+.navbar-dropdown-icon {
+  font-size: 16px;
+  color: white;
+}
+
+.navbar-user-image {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+}
+
+
+
+
+.menu-button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.user-image {
+  width: 20px;
+  height: 20px;
+  border-radius: 70%;
+  margin-right: 10px;
+}
+
+.username {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.side-menu {
+  position: fixed;
+  top: 0;
+  left: -10px; /* Move side menu to the left */
+  width: 250px;
+  height: 100%;
+  background-color: #1c4e80;
+  color: white;
+  padding: 20px;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.side-menu ul {
+  list-style: none;
+  padding: 0;
+}
+
+.side-menu ul li {
+  margin: 0px 0;
+  cursor: pointer;
+}
+
+.dashboardnav-SidebarList {
+  list-style: none;
+  padding: 0;
+}
+
+.dashboardnav-row {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  cursor: pointer;
+}
+
+.dashboardnav-row:hover {
+  background-color: #163d63;
+}
+
+#dashboardnav-icon {
+  margin-right: 10px;
+}
+
+#dashboardnav-title {
+  flex-grow: 1;
+}
+
+.dashboardnav-nested-list {
+  list-style: none;
+  padding: 0 0 0 20px;
+}
+
+.dashboardnav-nested-item {
+  padding: 5px 0;
+  cursor: pointer;
+}
+
+.dashboardnav-nested-item:hover {
+  background-color: #163d63;
+}
+
+.dashboardnav-rotate {
+  transform: rotate(180deg);
+}
+
+
+/* ================= TIMELINE CSS ================= */
+
+
+
+
+
+
+/* ================= FOOTER CSS ================= */
+
+
+
+.footer {
+  background: #222;
+  color: white;
+  padding: 20px 0;
+  text-align: center;
+  margin-top: 40px;
+}
+
+.footer-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.footer-links,
+.footer-policy,
+.footer-social {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
+.footer-link {
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+  transition: color 0.3s;
+}
+
+.footer-link:hover {
+  color: #ff5733;
+}
+
+.footer-social .social-icon {
+  color: white;
+  font-size: 20px;
+  transition: color 0.3s;
+}
+
+.footer-social .social-icon:hover {
+  color: #ff5733;
+}
+
+.footer-bottom {
+  margin-top: 10px;
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+
+
+/* ================= TIMELAPSE CSS ================= */
+
+
+
+/* General Styling */
+.timelapse-container {
+  padding: 20px;
+  background-color: #f4f4f4;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+}
+
+/* Header Controls */
+.header-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.dropdowns {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+label {
+  font-weight: bold;
+}
+
+.timelapse-select {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* Buttons */
+.action-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.timelapse-button {
+  padding: 10px 15px;
+  background-color: #0056b3;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.timelapse-button:hover {
+  background-color: #297ad1;
+}
+
+/* Camera Grid */
+.camera-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+/* Camera Card */
+.timelapse-card {
+  background-color: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.video-player {
+  width: 100%;
+  border-radius: 8px;
+}
+
+.no-video {
+  background-color: #ddd;
+  color: #555;
+  padding: 50px;
+  border-radius: 8px;
+}
+
+.camera-title {
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.timestamp {
+  font-size: 12px;
+  color: gray;
+}

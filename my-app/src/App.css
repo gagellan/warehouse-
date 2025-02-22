@@ -163,7 +163,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-image: url('./pixelcut-export (1).jpg');
+  background-image: url('../pixelcut-export (1).jpg');
   /* padding: 20px; */
   clear: both;  /* Ensures nothing overlaps */
   overflow: hidden; 

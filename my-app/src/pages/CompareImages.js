@@ -3,8 +3,8 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "../App.css"; // Import global styles
 import { ImgComparisonSlider } from '@img-comparison-slider/react';
-import img1 from "../assets/Screenshot (8).png";
-import img2 from "../assets/Screenshot (9).png";
+import img1 from "../assets/getty1.jpg";
+import img2 from "../assets/getty2.jpg";
 
 function CompareImages() {
   // State for datetime pickers

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../App.css"; // Import global styles
+import TimeSlider from "../components/TimelineSlider";
+
 
 const timeframes = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 const tags = ["P1", "T2", "C1", "A3"]; // Random tags
@@ -14,6 +16,7 @@ const Daywise = () => {
 
   return (
     <div className="image-dashboard">
+      <TimeSlider />
       <header className="image-dashboard-header">February, 2025</header>
       <div className="image-camera-grid">
         {[1, 2, 3, 5, 6, 7, 8, 9].map((row) => (

@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "../App.css"; // Keep the CSS structure unchanged
+import { FaEdit } from "react-icons/fa";
+import { FaCheckCircle } from "react-icons/fa";
+import { ImBin2 } from "react-icons/im";
 
 const VehicleDashboard = () => {
     const [searchQuery, setSearchQuery] = useState("");
@@ -75,11 +78,11 @@ const VehicleDashboard = () => {
                                         </span>
                                     </td>
                                     <td>
-                                        <i className="fas fa-edit"></i>
+                                        <FaEdit style={{ marginRight: "6px" , font: "40px"}} />
                                         {vehicle.status === "Registered" ? (
-                                            <i className="fas fa-check-circle"></i>
+                                            <FaCheckCircle style={{ marginLeft: "6px" , font: "40px"}} />
                                         ) : (
-                                            <i className="fas fa-trash"></i>
+                                            <ImBin2 style={{ marginLeft: "6px" , font: "40px"}} />
                                         )}
                                     </td>
                                 </tr>

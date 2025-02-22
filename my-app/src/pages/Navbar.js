@@ -28,18 +28,18 @@ function Navbar() {
   const location = useLocation();
   
     const pageTitles = {
-      "/": "Dashboard",
-      "/Dashboard": "Dashboard",
-      "/dashboard": "Dashboard",
-      "/images": "Images",
-      "/images/hourwise": "Hour Wise Images",
-      "/images/daywise": "Day Wise Images",
-      "/images/custom": "Custom Images",
-      "/reports": "Reports",
-      "/compareimages": "Compare Images",
-      "/timelapse": "Timelapse",
-      "/login": "Logout",
-      "/vehicledashboard": "Vehicle Dashboard"
+      "/": "DASHBOARD",
+      "/Dashboard": "DASHBOARD",
+      "/dashboard": "DASHBOARD",
+      "/images": "GALLERY",
+      "/images/hourwise": "HOUR WISE IMAGES",
+      "/images/daywise": "DAY WISE IMAGES",
+      "/images/custom": "CUSTOM IMAGES",
+      "/reports": "REPORTS",
+      "/compareimages": "COMPARE IMAGES",
+      "/timelapse": "TIMELAPSE",
+      "/login": "LOGOUT",
+      "/vehicledashboard": "VEHICLE DASHBOARD"
     };
   
     const currentPage = pageTitles[location.pathname];
@@ -74,7 +74,7 @@ function Navbar() {
               onClick={() => setDropdownOpen(!dropdownOpen)}
               >
             <div id="dashboardnav-icon"><IoImagesOutline /></div>
-            <div id="dashboardnav-title">Images</div>
+            <div id="dashboardnav-title">Gallery</div>
             <div id="dashboardnav-arrow"  className={dropdownOpen ? 'dashboardnav-rotate' : ''} ><MdKeyboardArrowDown /></div>
           </li>
           {dropdownOpen && (

@@ -5,6 +5,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import dayjs from "dayjs";
 import "./TimeSlider.css";
+import { CiFilter } from "react-icons/ci";
 
 const hours = Array.from({ length: 24 }, (_, i) => ({ value: i, label: i })); // Marks for hours
 
@@ -22,7 +23,7 @@ const TimeSlider = () => {
     <div className="time-slider-container .css-xvk2i-MuiSlider-track">
       {/* Date Picker */}
       <div className="date-picker">
-        {/* <CalendarTodayIcon /> */}
+      <CiFilter />
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DatePicker
             value={selectedDate}

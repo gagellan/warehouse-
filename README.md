@@ -2,6 +2,39 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+<<<<<<< HEAD
+=======
+## Project Structure
+
+The project has the following structure:
+
+```
+my-app
+├── public
+│   ├── index.html         # Main HTML file for the application
+│   ├── manifest.json      # Metadata for the web app
+│   └── robots.txt         # Controls how search engines index the site
+├── src
+│   ├── components
+│   │   ├── FloatingChat.css  # CSS styles for the Floating Chat component
+│   │   └── FloatingChat.js   # FloatingChat component for chat interface
+│   ├── pages
+│   │   ├── DemoPage.js       # Component for the Demo Page
+│   │   ├── FreeTrialPage.js   # Component for the Free Trial Page
+│   │   └── HomePage.js       # Component for the Home Page
+│   ├── App.css               # Global CSS styles for the application
+│   ├── App.js                # Main application component
+│   ├── App.test.js           # Tests for the App component
+│   ├── index.css             # Global styles for the application
+│   ├── index.js              # Entry point of the React application
+│   ├── reportWebVitals.js    # Used for measuring performance in the app
+│   └── setupTests.js         # Sets up the testing environment
+├── .gitignore                # Specifies files and directories to ignore by Git
+├── package.json              # Metadata about the project, including dependencies
+└── README.md                 # Documentation for the project
+```
+
+>>>>>>> 1a7c269c617be17214766f31e77a21d528bf2816
 ## Available Scripts
 
 In the project directory, you can run:
@@ -37,7 +70,11 @@ If you aren't satisfied with the build tool and configuration choices, you can `
 
 Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
 
+<<<<<<< HEAD
 You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+=======
+You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However, we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+>>>>>>> 1a7c269c617be17214766f31e77a21d528bf2816
 
 ## Learn More
 
@@ -67,4 +104,8 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 
 ### `npm run build` fails to minify
 
+<<<<<<< HEAD
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+=======
+This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+>>>>>>> 1a7c269c617be17214766f31e77a21d528bf2816

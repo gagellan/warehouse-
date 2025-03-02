@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../../assets/css/App.css";
+import "../../assets/css/FloatingChat.css";
 
 const FloatingChat = () => {
   const [isOpen, setIsOpen] = useState(false);

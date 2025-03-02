@@ -38,6 +38,7 @@ function App() {
       </Routes>
       {/* Floating Chat Component */}
       <FloatingChat />
+      
     </div>
   );
 }

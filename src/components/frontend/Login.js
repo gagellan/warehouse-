@@ -3,10 +3,30 @@ import "../../assets/css/App.css";
 import warehouseImage from "../../assets/images/download8.jpeg";
 
 const Login = () => {
+    const [formData, setFormData] = useState({
+        email: "",
+        password: ""
+    });
 
-    const handleclicklogin = (e) => {
-        e.preventDefault(); // Prevent the default form submission behavior
-        window.location.href = '/Dashboard'; // Redirect to the dashboard page
+    const [error, setError] = useState("");
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleclicklogin = async (e) => {
+        e.preventDefault();
+
+        try {
+            const response = await axios.post("http://127.0.0.1:5000/login", formData);
+
+            if (response.data.message) {
+                localStorage.setItem("session_key", response.data.session_key); // Store session key
+                window.location.href = "/Dashboard"; // Redirect to Dashboard
+            }
+        } catch (error) {
+            setError(error.response?.data?.error || "Invalid credentials");
+        }
     };
 
     return (
@@ -16,15 +36,13 @@ const Login = () => {
                     <img src={warehouseImage} alt="Warehouse" className="login-background-image" />
                 </div>
                 <div className="login-right-section">
-                    <div className="login-top-links">
-                    </div>
                     <h1>Welcome Back!</h1>
                     <br />
-                    <br />
+                    {error && <p style={{ color: "red" }}>{error}</p>}
                     <form className="login-form">
-                        <input type="text" placeholder="Username" className="login-input-box" required />
-                        <input type="password" placeholder="Password" className="login-input-box" required />
-                        <button type="submit" className="login-btn-primary"  onClick={handleclicklogin}>Sign In</button>
+                        <input type="email" name="email" placeholder="Email" className="login-input-box" onChange={handleChange} required />
+                        <input type="password" name="password" placeholder="Password" className="login-input-box" onChange={handleChange} required />
+                        <button type="submit" className="login-btn-primary" onClick={handleclicklogin}>Sign In</button>
                     </form>
                     <p className="login-signup-text">Don't have an account? <a href="/register"><b>Register</b></a></p>
                 </div>

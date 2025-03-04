@@ -7,7 +7,26 @@ import json
 import random
 from datetime import datetime, timedelta
 
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from flask_mail import Mail, Message
+import smtplib
+
+
+
+
 app = Flask(__name__)
+
+# Email Configuration
+app.config["MAIL_SERVER"] = "smtp.gmail.com"  # Use your SMTP server
+app.config["MAIL_PORT"] = 587
+app.config["MAIL_USE_TLS"] = True
+app.config["MAIL_USERNAME"] = "alpenchristy459@gmail.com"  # Your email
+app.config["MAIL_PASSWORD"] = "mwrb uylg ggai ggac"  # App password (not your actual email password)
+
+mail = Mail(app)
+
 CORS(app)
 bcrypt = Bcrypt(app)
 
@@ -147,6 +166,123 @@ def login():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+
+
+import random
+
+@app.route("/forgot-password", methods=["POST"])
+def forgot_password():
+    try:
+        data = request.json
+        email = data.get("email")
+
+        if not email:
+            return jsonify({"error": "Email is required"}), 400
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Check if user exists
+        cursor.execute("SELECT * FROM BKLWM_AUTH_USER WHERE EMAIL_ID = %s", (email,))
+        user = cursor.fetchone()
+
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        # Generate a 6-digit OTP
+        otp = str(random.randint(100000, 999999))
+        expire_time = (datetime.now() + timedelta(minutes=10)).strftime("%Y-%m-%d %H:%M:%S")  # OTP expires in 10 mins
+
+        # Store OTP in the user table (temporarily using LAST_LOGIN field)
+        cursor.execute("UPDATE BKLWM_AUTH_USER SET LAST_LOGIN = %s WHERE EMAIL_ID = %s", (otp, email))
+        conn.commit()
+
+        # Send OTP via email
+        msg = Message("Password Reset OTP", sender="your-email@gmail.com", recipients=[email])
+        msg.body = f"Your OTP for password reset is: {otp}. It will expire in 10 minutes."
+        mail.send(msg)
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({"message": "OTP sent to your email"}), 200
+
+    except smtplib.SMTPException as smtp_error:
+        return jsonify({"error": f"SMTP error: {smtp_error}"}), 500
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+
+
+@app.route("/reset-password", methods=["POST"])
+def reset_password():
+    try:
+        data = request.json
+        email = data.get("email")
+        otp = data.get("otp")
+        new_password = data.get("newPassword")
+        confirm_password = data.get("confirmPassword")
+
+        if not all([email, otp, new_password, confirm_password]):
+            return jsonify({"error": "All fields are required"}), 400
+
+        if new_password != confirm_password:
+            return jsonify({"error": "Passwords do not match"}), 400
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Verify OTP
+        cursor.execute("SELECT * FROM BKLWM_AUTH_USER WHERE EMAIL_ID = %s", (email,))
+        user = cursor.fetchone()
+
+        if not user or user["LAST_LOGIN"] != otp:
+            return jsonify({"error": "Invalid OTP"}), 400
+
+        # Hash new password
+        hashed_password = bcrypt.generate_password_hash(new_password).decode("utf-8")
+
+        # Update password and clear OTP
+        cursor.execute("UPDATE BKLWM_AUTH_USER SET PASSWORD = %s, LAST_LOGIN = NULL WHERE EMAIL_ID = %s", (hashed_password, email))
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({"message": "Password reset successful"}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+
+def send_email(to_email, reset_link):
+    try:
+        sender_email = "your_email@example.com"  # Replace with your email
+        sender_password = "your_email_password"  # Replace with your password
+        subject = "Password Reset Request"
+
+        message = MIMEMultipart()
+        message["From"] = sender_email
+        message["To"] = to_email
+        message["Subject"] = subject
+        body = f"Click the link below to reset your password:\n\n{reset_link}"
+        message.attach(MIMEText(body, "plain"))
+
+        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server.starttls()
+        server.login(sender_email, sender_password)
+        server.sendmail(sender_email, to_email, message.as_string())
+        server.quit()
+
+        print("Password reset email sent.")
+
+    except Exception as e:
+        print(f"Error sending email: {e}")
+
 
 if __name__ == "__main__":
     app.run(debug=True)

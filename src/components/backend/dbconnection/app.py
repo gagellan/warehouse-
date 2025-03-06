@@ -193,14 +193,14 @@ def forgot_password():
 
         # Generate a 6-digit OTP
         otp = str(random.randint(100000, 999999))
-        expire_time = (datetime.now() + timedelta(minutes=10)).strftime("%Y-%m-%d %H:%M:%S")  # OTP expires in 10 mins
+        expire_time = (datetime.now() + timedelta(minutes=10)).strftime("%Y-%m-%d %H:%M:%S")  # OTP expires in 10 minutes
 
-        # Store OTP in the user table (temporarily using LAST_LOGIN field)
-        cursor.execute("UPDATE BKLWM_AUTH_USER SET LAST_LOGIN = %s WHERE EMAIL_ID = %s", (otp, email))
+        # Store OTP in RESET_OTP field
+        cursor.execute("UPDATE BKLWM_AUTH_USER SET RESET_OTP = %s WHERE EMAIL_ID = %s", (otp, email))
         conn.commit()
 
         # Send OTP via email
-        msg = Message("Password Reset OTP", sender="your-email@gmail.com", recipients=[email])
+        msg = Message("Password Reset OTP", sender="alpenchristy459@gmail.com", recipients=[email])
         msg.body = f"Your OTP for password reset is: {otp}. It will expire in 10 minutes."
         mail.send(msg)
 
@@ -213,8 +213,6 @@ def forgot_password():
         return jsonify({"error": f"SMTP error: {smtp_error}"}), 500
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
-
 
 
 @app.route("/reset-password", methods=["POST"])
@@ -235,18 +233,21 @@ def reset_password():
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # Verify OTP
+        # Fetch stored OTP from RESET_OTP column
         cursor.execute("SELECT * FROM BKLWM_AUTH_USER WHERE EMAIL_ID = %s", (email,))
         user = cursor.fetchone()
 
-        if not user or user["LAST_LOGIN"] != otp:
+        print("Stored OTP:", user["RESET_OTP"])  # Debugging print
+        print("Entered OTP:", otp)  # Debugging print
+
+        if not user or str(user["RESET_OTP"]) != str(otp):
             return jsonify({"error": "Invalid OTP"}), 400
 
         # Hash new password
         hashed_password = bcrypt.generate_password_hash(new_password).decode("utf-8")
 
         # Update password and clear OTP
-        cursor.execute("UPDATE BKLWM_AUTH_USER SET PASSWORD = %s, LAST_LOGIN = NULL WHERE EMAIL_ID = %s", (hashed_password, email))
+        cursor.execute("UPDATE BKLWM_AUTH_USER SET PASSWORD = %s, RESET_OTP = NULL WHERE EMAIL_ID = %s", (hashed_password, email))
         conn.commit()
 
         cursor.close()
@@ -255,14 +256,13 @@ def reset_password():
         return jsonify({"message": "Password reset successful"}), 200
 
     except Exception as e:
+        print("Exception:", str(e))  # Debugging print
         return jsonify({"error": str(e)}), 500
-
-
 
 def send_email(to_email, reset_link):
     try:
-        sender_email = "your_email@example.com"  # Replace with your email
-        sender_password = "your_email_password"  # Replace with your password
+        sender_email = "alpenchristy459@gmail.com"  # Replace with your email
+        sender_password = "mwrb uylg ggai ggac"  # Replace with your password
         subject = "Password Reset Request"
 
         message = MIMEMultipart()

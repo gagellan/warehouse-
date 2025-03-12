@@ -38,29 +38,61 @@ function Navbar() {
     }
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("sessionKey");
-    localStorage.removeItem("userFirstName");
-    window.location.href = "/login"; // Redirect to login page
+  const handleLogout = async () => {
+    const sessionKey = localStorage.getItem("sessionKey");
+
+    if (!sessionKey) {
+        alert("You are already logged out!");
+        window.location.href = "/login";
+        return;
+    }
+
+    try {
+        console.log("Sending session key:", sessionKey); // ✅ Debugging
+
+        const response = await fetch("http://localhost:5000/logout", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ session_key: sessionKey }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            console.log("Logout successful"); // ✅ Debugging
+            localStorage.removeItem("sessionKey");
+            localStorage.removeItem("userFirstName");
+            window.location.href = "/login"; 
+        } else {
+            console.error("Logout failed:", data.error);
+            alert(data.error || "Failed to log out. Please try again.");
+        }
+    } catch (error) {
+        console.error("Logout error:", error);
+        alert("Something went wrong. Please try again later.");
+    }
+};
+
+
+
+  const pageTitles = {
+    "/": "DASHBOARD",
+    "/Dashboard": "DASHBOARD",
+    "/dashboard": "DASHBOARD",
+    "/images": "GALLERY",
+    "/images/hourwise": "HOUR WISE IMAGES",
+    "/images/daywise": "DAY WISE IMAGES",
+    "/images/custom": "CUSTOM IMAGES",
+    "/reports": "REPORTS",
+    "/compareimages": "COMPARE IMAGES",
+    "/timelapse": "TIMELAPSE",
+    "/login": "LOGOUT",
+    "/vehicledashboard": "VEHICLE DASHBOARD"
   };
-  
-  
-    const pageTitles = {
-      "/": "DASHBOARD",
-      "/Dashboard": "DASHBOARD",
-      "/dashboard": "DASHBOARD",
-      "/images": "GALLERY",
-      "/images/hourwise": "HOUR WISE IMAGES",
-      "/images/daywise": "DAY WISE IMAGES",
-      "/images/custom": "CUSTOM IMAGES",
-      "/reports": "REPORTS",
-      "/compareimages": "COMPARE IMAGES",
-      "/timelapse": "TIMELAPSE",
-      "/login": "LOGOUT",
-      "/vehicledashboard": "VEHICLE DASHBOARD"
-    };
-  
-    const currentPage = pageTitles[location.pathname];
+
+  const currentPage = pageTitles[location.pathname];
 
 
 
@@ -101,34 +133,34 @@ function Navbar() {
 
           {/* Images with Dropdown */}
           <li className="dashboardnav-row"
-              id={window.location.pathname.startsWith('/images') ? 'dashboardnav-active' : ''}
-              onClick={() => setDropdownOpen(!dropdownOpen)}
-              >
+            id={window.location.pathname.startsWith('/images') ? 'dashboardnav-active' : ''}
+            onClick={() => setDropdownOpen(!dropdownOpen)}
+          >
             <div id="dashboardnav-icon"><IoImagesOutline /></div>
             <div id="dashboardnav-title">Gallery</div>
-            <div id="dashboardnav-arrow"  className={dropdownOpen ? 'dashboardnav-rotate' : ''} ><MdKeyboardArrowDown /></div>
+            <div id="dashboardnav-arrow" className={dropdownOpen ? 'dashboardnav-rotate' : ''} ><MdKeyboardArrowDown /></div>
           </li>
           {dropdownOpen && (
             <ul className="dashboardnav-nested-list">
-            <li
-              className="dashboardnav-nested-item"
-              onClick={() => navigate('/images/hourwise')}
-            >
-              <span className="dashboardnav-nested-icon"><TbClockHour5Filled /></span> Hour Wise
-            </li>
-            <li
-              className="dashboardnav-nested-item"
-              onClick={() => navigate('/images/daywise')}
-            >
-              <span className="dashboardnav-nested-icon"><MdOutlineToday /></span> Day Wise
-            </li>
-            <li
-              className="dashboardnav-nested-item"
-              onClick={() => navigate('/images/custom')}
-            >
-              <span className="dashboardnav-nested-icon"><LuInfinity /></span> Custom
-            </li>
-          </ul>
+              <li
+                className="dashboardnav-nested-item"
+                onClick={() => navigate('/images/hourwise')}
+              >
+                <span className="dashboardnav-nested-icon"><TbClockHour5Filled /></span> Hour Wise
+              </li>
+              <li
+                className="dashboardnav-nested-item"
+                onClick={() => navigate('/images/daywise')}
+              >
+                <span className="dashboardnav-nested-icon"><MdOutlineToday /></span> Day Wise
+              </li>
+              <li
+                className="dashboardnav-nested-item"
+                onClick={() => navigate('/images/custom')}
+              >
+                <span className="dashboardnav-nested-icon"><LuInfinity /></span> Custom
+              </li>
+            </ul>
           )}
 
           {/* Compare Images */}
@@ -171,7 +203,7 @@ function Navbar() {
           <li
             className="dashboardnav-row"
             id={window.location.pathname === "/login" ? "dashboardnav-active" : ""}
-            onClick={handleLogout} // Call the logout function when clicked
+            onClick={handleLogout}
           >
             <div id="dashboardnav-icon"><MdOutlineLogout /></div>
             <div id="dashboardnav-title">Logout</div>
@@ -204,10 +236,10 @@ function Navbar() {
 
           {/* <div className="navbar-profile">
             <span className="navbar-email">ramaksccL@gmail.com</span> */}
-            {/* <MdKeyboardArrowDown className="navbar-dropdown-icon" /> */}
-            {/* <div className="navbar-email-icon"><VscAccount /></div> */}
-            {/* <img src={userImage} alt="User" className="navbar-user-image" /> */}
-          
+          {/* <MdKeyboardArrowDown className="navbar-dropdown-icon" /> */}
+          {/* <div className="navbar-email-icon"><VscAccount /></div> */}
+          {/* <img src={userImage} alt="User" className="navbar-user-image" /> */}
+
         </div>
       </div>
     </div>

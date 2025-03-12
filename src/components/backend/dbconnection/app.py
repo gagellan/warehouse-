@@ -16,7 +16,7 @@ import smtplib
 
 app = Flask(__name__)
 
-with open("src/components/backend/dbconnection/dbconfig.json", "r") as config_file:
+with open(r"D:\bikanelite-wm\src\components\backend\dbconnection\dbconfig.json", "r") as config_file:
     config_data = json.load(config_file)
 
 db_config = config_data["db_config"]
@@ -100,10 +100,29 @@ def register():
         
         cursor.execute(
             """
-            INSERT INTO BKLWM_AUTH_USER (ID, FIRST_NAME, LAST_NAME, EMAIL_ID, PASSWORD, CREATED_DATE, LAST_LOGIN, IS_USER_ACTIVE, USERNAME, MOBILE_NUMBER, COUNTRY, PHONE_CODE) 
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO BKLWM_AUTH_USER (
+                ID, FIRST_NAME, LAST_NAME, EMAIL_ID, PASSWORD, CREATED_DATE, 
+                LAST_LOGIN, IS_USER_ACTIVE, USERNAME, MOBILE_NUMBER, COUNTRY, PHONE_CODE
+            ) 
+            VALUES (
+                %(user_id)s, %(first_name)s, %(last_name)s, %(email)s, %(hashed_password)s, %(created_date)s, 
+                %(last_login)s, %(is_user_active)s, %(username)s, %(mobile_number)s, %(country)s, %(phone_code)s
+            )
             """,
-            (user_id, first_name, last_name, email, hashed_password, created_date, last_login, 1, username, mobile_number, country, phone_code)
+            {
+                "user_id": user_id,
+                "first_name": first_name,
+                "last_name": last_name,
+                "email": email,
+                "hashed_password": hashed_password,
+                "created_date": created_date,
+                "last_login": last_login,
+                "is_user_active": 1,
+                "username": username,
+                "mobile_number": mobile_number,
+                "country": country,
+                "phone_code": phone_code
+            }
         )
 
         
@@ -129,10 +148,7 @@ def login():
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # # Check if user exists
-        # cursor.execute("SELECT * FROM BKLWM_AUTH_USER WHERE EMAIL_ID = %s", (email,))
-        # user = cursor.fetchone()
-        
+        # Check if user exists
         cursor.execute("SELECT ID, FIRST_NAME, EMAIL_ID, PASSWORD FROM BKLWM_AUTH_USER WHERE EMAIL_ID = %s", (email,))
         user = cursor.fetchone()
 
@@ -151,34 +167,91 @@ def login():
         # Generate session key
         session_key = str(uuid.uuid4())
         session_data = json.dumps({"user_id": user["ID"], "email": email})
-        expire_date = (datetime.now() + timedelta(hours=2)).strftime("%Y-%m-%d %H:%M:%S")  # Session expires in 2 hours
+        expire_date = (datetime.now() + timedelta(hours=2)).strftime("%Y-%m-%d %H:%M:%S")
+        
+        # Get IP Address
+        ip_address = request.remote_addr
 
-        # Store session in DB
+        # Insert session into database (including new fields)
         cursor.execute(
-            "INSERT INTO BKLWM_SESSION (SESSION_KEY, SESSION_DATA, EXPIRE_DATE) VALUES (%s, %s, %s)",
-            (session_key, session_data, expire_date)
+            """
+            INSERT INTO BKLWM_SESSION 
+            (SESSION_KEY, SESSION_DATA, EXPIRE_DATE, CREATED_DATE, IP_ADDRESS, IS_ACTIVE) 
+            VALUES (%s, %s, %s, %s, %s, %s)
+            """,
+            (session_key, session_data, expire_date, last_login_time, ip_address, True)
         )
+
         conn.commit()
 
         cursor.close()
         conn.close()
 
-        # return jsonify({
-        #     "message": "Login successful",
-        #     "session_key": session_key,
-        #     "first_name": user["FIRST_NAME"]  # Send first name to frontend
-        # }), 200 
-        
         return jsonify({
             "message": "Login successful",
             "session_key": session_key,
-            "first_name": user.get("FIRST_NAME")  # Use .get() to avoid KeyError
+            "first_name": user.get("FIRST_NAME")
         }), 200
-        
-    
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+
+@app.route("/logout", methods=["POST"])
+def logout():
+    try:
+        data = request.json
+        session_key = data.get("session_key")
+
+        if not session_key:
+            return jsonify({"error": "Session key is required"}), 400
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # 🛠️ Debugging log
+        print(f"Received session key: {session_key}")
+
+        # Check if session exists and is active
+        cursor.execute(
+            "SELECT * FROM BKLWM_SESSION WHERE SESSION_KEY = %s",
+            (session_key,)
+        )
+        session = cursor.fetchone()
+
+        if not session:
+            print("Session not found or already inactive")
+            return jsonify({"error": "Invalid or already logged out"}), 400
+
+        # 🛠️ Debugging log
+        print(f"Current IS_ACTIVE value: {session['IS_ACTIVE']}")
+
+        # Deactivate the session
+        cursor.execute(
+            "UPDATE BKLWM_SESSION SET IS_ACTIVE = %s WHERE SESSION_KEY = %s",
+            (0, session_key)  # Ensure this value matches the data type in DB
+        )
+        conn.commit()
+
+        # Confirm update
+        cursor.execute(
+            "SELECT IS_ACTIVE FROM BKLWM_SESSION WHERE SESSION_KEY = %s",
+            (session_key,)
+        )
+        updated_session = cursor.fetchone()
+        print(f"Updated IS_ACTIVE value: {updated_session['IS_ACTIVE']}")
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({"message": "Logout successful"}), 200
+
+    except Exception as e:
+        print(f"Error during logout: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
 
 
 

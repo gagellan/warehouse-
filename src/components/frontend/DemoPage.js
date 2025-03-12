@@ -2,66 +2,50 @@ import React, { useEffect, useState } from "react";
 import "../../assets/css/App.css";
 
 const DemoPage = () => {
-  const [countries, setCountries] = useState([]);
-  const [states, setStates] = useState([]);
-  const [selectedCountry, setSelectedCountry] = useState("");
-  const [selectedState, setSelectedState] = useState("");
-  const [phoneCode, setPhoneCode] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [countries, setCountries] = useState([]); // Store country list
+  const [selectedCountry, setSelectedCountry] = useState(""); // Selected country
+  const [phoneCode, setPhoneCode] = useState(""); // Phone code
+  const [phoneNumber, setPhoneNumber] = useState(""); // Full phone number
+  const [isChecked, setIsChecked] = useState(false);
 
-  const API_KEY = "U0dMdUZ1R3JKYWFtOEU2eVppM1BzZDlLUzlySE40MUs3QUEwSzQyTA=="; // Replace with actual API key
-
+  // Fetch countries.json from the public folder
   useEffect(() => {
-    async function fetchCountries() {
-      try {
-        const response = await fetch("https://restcountries.com/v3.1/all");
-        const data = await response.json();
-        const countryList = data
-          .filter(country => country.idd?.root)
-          .map((country) => ({
-            name: country.name.common,
-            code: country.cca2,
-            phoneCode: country.idd.root + (country.idd.suffixes ? country.idd.suffixes[0] : ""),
-          }));
-        setCountries(countryList.sort((a, b) => a.name.localeCompare(b.name)));
-      } catch (error) {
-        console.error("Error fetching countries:", error);
-      }
-    }
-    fetchCountries();
+    fetch("/countries.json")
+      .then((response) => {
+        if (!response.ok) throw new Error("Failed to load countries.json");
+        return response.json();
+      })
+      .then((data) => setCountries(data.countries || []))
+      .catch((error) => console.error("Error fetching countries:", error));
   }, []);
 
-  async function fetchStates(countryCode) {
-    if (!countryCode) return;
-    try {
-      const response = await fetch(`https://api.countrystatecity.in/v1/countries/${countryCode}/states`, {
-        headers: { "X-CSCAPI-KEY": API_KEY },
-      });
-      if (!response.ok) throw new Error("Failed to fetch states");
-
-      const data = await response.json();
-      setStates(data);
-    } catch (error) {
-      console.error("Error fetching states:", error);
-      setStates([]);
-    }
-  }
-
+  // Handle country selection
   const handleCountryChange = (event) => {
-    const countryCode = event.target.value;
-    setSelectedCountry(countryCode);
+    const countryName = event.target.value;
+    setSelectedCountry(countryName);
 
-    const country = countries.find((c) => c.code === countryCode);
+    const country = countries.find((c) => c.name === countryName);
     if (country) {
-      setPhoneCode(country.phoneCode);
-      setPhoneNumber(country.phoneCode + " ");
+      setPhoneCode(country.code);
+      setPhoneNumber(country.code + " "); // Pre-fill phone number with code
     } else {
       setPhoneCode("");
       setPhoneNumber("");
     }
+  };
 
-    fetchStates(countryCode);
-    setSelectedState("");
+
+  // Handle form submission
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    if (!isChecked) {
+      alert("Please agree to receive marketing communications before submitting.");
+      return;
+    }
+
+    // Handle form submission logic here
+    console.log("Form submitted successfully!");
   };
 
   return (
@@ -71,15 +55,15 @@ const DemoPage = () => {
         <div className="content-wrapper">
           <div className="content">
             <h3>Discover How Gagellan Global Solutions Transforms Warehouse Operations</h3>
-            <br />
-            <p>✅<b> Experience AI-driven warehouse monitoring</b> - Get real-time insights into your operations</p>
-            <br />
-            <p>✅<b> Optimize security & compliance</b> - Ensure adherence to SOPs with automated alerts</p>
-            <br />
-            <p>✅<b> Streamline loading & unloading tracking</b> - Gain visibility into truck movement & workforce activity</p>
-            <br />
-            <p>✅<b> Leverage AI-powered analytics</b> - Identify trends, detect inefficiencies, and make data-driven decisions</p>
-            <br />
+            <br></br>
+            <p>✅ <b>Experience AI-driven warehouse monitoring</b> - Get real-time insights into your operations</p>
+            <br></br>
+            <p>✅ <b>Optimize security & compliance</b> - Ensure adherence to SOPs with automated alerts</p>
+            <br></br>
+            <p>✅ <b>Streamline loading & unloading tracking</b> - Gain visibility into truck movement & workforce activity</p>
+            <br></br>
+            <p>✅ <b>Leverage AI-powered analytics</b> - Identify trends, detect inefficiencies, and make data-driven decisions</p>
+            <br></br>
           </div>
 
           <div className="form-container">
@@ -90,28 +74,43 @@ const DemoPage = () => {
               <input type="text" placeholder="Company Name" />
               <input type="text" placeholder="Job Title" />
 
+              {/* Country & Phone Number Section */}
               <div className="phone-container">
                 <select onChange={handleCountryChange} value={selectedCountry}>
                   <option value="">Select Country</option>
                   {countries.map((country) => (
-                    <option key={country.code} value={country.code}>
+                    <option key={country.name} value={country.name}>
                       {country.name}
                     </option>
                   ))}
                 </select>
-                <input type="tel" placeholder="Phone Number" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
+                <input
+                  type="tel"
+                  placeholder="Phone Number"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                />
               </div>
 
-              <select value={selectedState} onChange={(e) => setSelectedState(e.target.value)}>
-                <option value="">Select State</option>
-                {states.map((state) => (
-                  <option key={state.iso2} value={state.iso2}>
-                    {state.name}
-                  </option>
-                ))}
-              </select>
-
               <textarea placeholder="Please tell us more about how we can help you..." rows="4"></textarea>
+
+              {/* Marketing Consent Checkbox */}
+              <div className="checkbox-container">
+                <input
+                  type="checkbox"
+                  id="marketingConsent"
+                  checked={isChecked}
+                  onChange={() => setIsChecked(!isChecked)}
+                  required
+                />
+                <label htmlFor="marketingConsent" className="freeconsent-label">
+                  I agree to receive marketing communications from Gagellan Global Solutions.  
+                  You can unsubscribe from these communications at any time. For more  
+                  information on how to unsubscribe, our privacy practices, and how we are  
+                  committed to protecting and respecting your privacy, please read our full  
+                  <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="freeconsent-link"> Privacy Policy</a>.
+                </label>
+              </div>
 
               <button type="submit" className="btn demo-btn">Request A Demo</button>
             </form>

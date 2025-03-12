@@ -14,29 +14,24 @@ from flask_mail import Mail, Message
 import smtplib
 
 
-
-
 app = Flask(__name__)
+
+with open("src/components/backend/dbconnection/dbconfig.json", "r") as config_file:
+    config_data = json.load(config_file)
+
+db_config = config_data["db_config"]
 
 # Email Configuration
 app.config["MAIL_SERVER"] = "smtp.gmail.com"  # Use your SMTP server
 app.config["MAIL_PORT"] = 587
 app.config["MAIL_USE_TLS"] = True
-app.config["MAIL_USERNAME"] = "alpenchristy459@gmail.com"  # Your email
-app.config["MAIL_PASSWORD"] = "mwrb uylg ggai ggac"  # App password (not your actual email password)
+app.config["MAIL_USERNAME"] = "ishasolanki0225@gmail.com"  # Your email
+app.config["MAIL_PASSWORD"] = "grcq gjmz ispg egmg"  # App password (not your actual email password)
 
 mail = Mail(app)
 
 CORS(app)
 bcrypt = Bcrypt(app)
-
-# Database Configuration
-db_config = {
-    "host": "162.241.116.193",
-    "user": "ejaik1cd_bikanelite_dev",
-    "password": "Isha#1234567",
-    "database": "ejaik1cd_bikanelite_dev"
-}
 
 def get_db_connection():
     return pymysql.connect(
@@ -46,6 +41,7 @@ def get_db_connection():
         database=db_config["database"],
         cursorclass=pymysql.cursors.DictCursor
     )
+
 def generate_unique_id():
     """Generates a unique ID in the format GGSBWM_XXXX"""
     conn = get_db_connection()
@@ -74,8 +70,10 @@ def register():
         mobile_number = data.get("mobileNumber")
         password = data.get("password")
         confirm_password = data.get("confirmPassword")
+        country = data.get("country")
+        phone_code = data.get("phoneCode")
 
-        if not all([first_name, last_name, email, mobile_number, password, confirm_password]):
+        if not all([first_name, last_name, email, mobile_number, password, confirm_password, country, phone_code]):
             return jsonify({"error": "All fields are required"}), 400
 
         if password != confirm_password:
@@ -99,15 +97,15 @@ def register():
         existing_user = cursor.fetchone()
         if existing_user:
             return jsonify({"error": "User already exists"}), 400
-
-        # Insert user into database with formatted ID
+        
         cursor.execute(
             """
-            INSERT INTO BKLWM_AUTH_USER (ID, FIRST_NAME, LAST_NAME, EMAIL_ID, PASSWORD, CREATED_DATE, LAST_LOGIN, IS_USER_ACTIVE, USERNAME, MOBILE_NUMBER) 
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO BKLWM_AUTH_USER (ID, FIRST_NAME, LAST_NAME, EMAIL_ID, PASSWORD, CREATED_DATE, LAST_LOGIN, IS_USER_ACTIVE, USERNAME, MOBILE_NUMBER, COUNTRY, PHONE_CODE) 
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """,
-            (user_id, first_name, last_name, email, hashed_password, created_date, last_login, 1, username, mobile_number)
+            (user_id, first_name, last_name, email, hashed_password, created_date, last_login, 1, username, mobile_number, country, phone_code)
         )
+
         
         conn.commit()
         cursor.close()
@@ -131,8 +129,11 @@ def login():
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # Check if user exists
-        cursor.execute("SELECT * FROM BKLWM_AUTH_USER WHERE EMAIL_ID = %s", (email,))
+        # # Check if user exists
+        # cursor.execute("SELECT * FROM BKLWM_AUTH_USER WHERE EMAIL_ID = %s", (email,))
+        # user = cursor.fetchone()
+        
+        cursor.execute("SELECT ID, FIRST_NAME, EMAIL_ID, PASSWORD FROM BKLWM_AUTH_USER WHERE EMAIL_ID = %s", (email,))
         user = cursor.fetchone()
 
         if not user:
@@ -162,7 +163,19 @@ def login():
         cursor.close()
         conn.close()
 
-        return jsonify({"message": "Login successful", "session_key": session_key}), 200
+        # return jsonify({
+        #     "message": "Login successful",
+        #     "session_key": session_key,
+        #     "first_name": user["FIRST_NAME"]  # Send first name to frontend
+        # }), 200 
+        
+        return jsonify({
+            "message": "Login successful",
+            "session_key": session_key,
+            "first_name": user.get("FIRST_NAME")  # Use .get() to avoid KeyError
+        }), 200
+        
+    
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -200,7 +213,7 @@ def forgot_password():
         conn.commit()
 
         # Send OTP via email
-        msg = Message("Password Reset OTP", sender="alpenchristy459@gmail.com", recipients=[email])
+        msg = Message("Password Reset OTP", sender="ishasolanki0225@gmail.com", recipients=[email])
         msg.body = f"Your OTP for password reset is: {otp}. It will expire in 10 minutes."
         mail.send(msg)
 
@@ -261,8 +274,8 @@ def reset_password():
 
 def send_email(to_email, reset_link):
     try:
-        sender_email = "alpenchristy459@gmail.com"  # Replace with your email
-        sender_password = "mwrb uylg ggai ggac"  # Replace with your password
+        sender_email = "ishasolanki0225@gmail.com"  # Replace with your email
+        sender_password = "grcq gjmz ispg egmg"  # Replace with your password
         subject = "Password Reset Request"
 
         message = MIMEMultipart()

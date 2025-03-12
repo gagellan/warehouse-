@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+// import React, { useState } from 'react';
 import "../../assets/css/App.css";
 // import logo from '../assets/images/logo.jpg';
 import logo from '../../assets/images/logo.jpg';
+import React, { useEffect, useState } from "react";
+
 import { useLocation } from "react-router-dom";
 
 import { IoHomeOutline } from "react-icons/io5";
@@ -27,6 +29,21 @@ function Navbar() {
 
 
   const location = useLocation();
+  const [userFirstName, setUserFirstName] = useState("");
+
+  useEffect(() => {
+    const firstName = localStorage.getItem("userFirstName");
+    if (firstName) {
+      setUserFirstName(firstName);
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("sessionKey");
+    localStorage.removeItem("userFirstName");
+    window.location.href = "/login"; // Redirect to login page
+  };
+  
   
     const pageTitles = {
       "/": "DASHBOARD",
@@ -46,9 +63,22 @@ function Navbar() {
     const currentPage = pageTitles[location.pathname];
 
 
+
+
   const [dropdownOpen, setDropdownOpen] = useState(false); // State for dropdown
   const [sideMenuOpen, setSideMenuOpen] = useState(false); // State for side menu
   const navigate = useNavigate();
+
+  // const Navbar = () => {
+  //   const [userEmail, setUserEmail] = useState("");
+
+  //   useEffect(() => {
+  //       const email = localStorage.getItem("userEmail");
+  //       if (email) {
+  //           setUserEmail(email);
+  //       }
+  //   }, []);
+
 
   return (
     <div>
@@ -140,8 +170,8 @@ function Navbar() {
 
           <li
             className="dashboardnav-row"
-            id={window.location.pathname === '/login' ? 'dashboardnav-active' : ''}
-            onClick={() => navigate('/login')}
+            id={window.location.pathname === "/login" ? "dashboardnav-active" : ""}
+            onClick={handleLogout} // Call the logout function when clicked
           >
             <div id="dashboardnav-icon"><MdOutlineLogout /></div>
             <div id="dashboardnav-title">Logout</div>
@@ -160,12 +190,24 @@ function Navbar() {
           <AiOutlineSetting className="navbar-icon" />
           <BsQuestionCircle className="navbar-icon" />
 
+          {/* User Profile with First Name */}
           <div className="navbar-profile">
-            <span className="navbar-email">ramaksccL@gmail.com</span>
-            {/* <MdKeyboardArrowDown className="navbar-dropdown-icon" /> */}
+            <span className="navbar-email">{userFirstName || "Guest"}</span>
             <div className="navbar-email-icon"><VscAccount /></div>
-            {/* <img src={userImage} alt="User" className="navbar-user-image" /> */}
           </div>
+
+          {/* User Profile with Email */}
+          {/* <div className="navbar-profile">
+            <span className="navbar-email">{userEmail || "Guest"}</span>
+            <div className="navbar-email-icon"><VscAccount /></div>
+          </div> */}
+
+          {/* <div className="navbar-profile">
+            <span className="navbar-email">ramaksccL@gmail.com</span> */}
+            {/* <MdKeyboardArrowDown className="navbar-dropdown-icon" /> */}
+            {/* <div className="navbar-email-icon"><VscAccount /></div> */}
+            {/* <img src={userImage} alt="User" className="navbar-user-image" /> */}
+          
         </div>
       </div>
     </div>

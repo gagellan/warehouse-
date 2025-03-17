@@ -137,6 +137,7 @@ def register():
 
 @app.route("/login", methods=["POST"])
 def login():
+    
     try:
         data = request.json
         email = data.get("email")
@@ -149,7 +150,7 @@ def login():
         cursor = conn.cursor()
 
         # Check if user exists
-        cursor.execute("SELECT ID, FIRST_NAME, EMAIL_ID, PASSWORD FROM BKLWM_AUTH_USER WHERE EMAIL_ID = %s", (email,))
+        cursor.execute("SELECT * FROM BKLWM_AUTH_USER WHERE EMAIL_ID = %s", (email,))
         user = cursor.fetchone()
 
         if not user:
@@ -160,28 +161,23 @@ def login():
             return jsonify({"error": "Invalid credentials"}), 401
 
         # Update last login timestamp
-        last_login_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        last_login_time = datetime.now()
         cursor.execute("UPDATE BKLWM_AUTH_USER SET LAST_LOGIN = %s WHERE EMAIL_ID = %s", (last_login_time, email))
         conn.commit()
 
         # Generate session key
         session_key = str(uuid.uuid4())
         session_data = json.dumps({"user_id": user["ID"], "email": email})
-        expire_date = (datetime.now() + timedelta(hours=2)).strftime("%Y-%m-%d %H:%M:%S")
-        
-        # Get IP Address
-        ip_address = request.remote_addr
+        expire_date = datetime.now() + timedelta(hours=2)
 
-        # Insert session into database (including new fields)
+        # Insert session into the database
         cursor.execute(
             """
-            INSERT INTO BKLWM_SESSION 
-            (SESSION_KEY, SESSION_DATA, EXPIRE_DATE, CREATED_DATE, IP_ADDRESS, IS_ACTIVE) 
+            INSERT INTO BKLWM_SESSION (SESSION_KEY, SESSION_DATA, EXPIRE_DATE, CREATED_DATE, IP_ADDRESS, IS_ACTIVE)
             VALUES (%s, %s, %s, %s, %s, %s)
             """,
-            (session_key, session_data, expire_date, last_login_time, ip_address, True)
+            (session_key, session_data, expire_date, last_login_time, request.remote_addr or "127.0.0.1", 1)
         )
-
         conn.commit()
 
         cursor.close()
@@ -190,57 +186,93 @@ def login():
         return jsonify({
             "message": "Login successful",
             "session_key": session_key,
-            "first_name": user.get("FIRST_NAME")
+            "first_name": user["FIRST_NAME"]
         }), 200
 
     except Exception as e:
+        print(f"Error during login: {e}")
         return jsonify({"error": str(e)}), 500
 
+
+@app.route("/test", methods=["POST"])
+def test():
+    print("Test endpoint hit!", flush=True)
+    return jsonify({"message": "Test successful"})
 
 
 @app.route("/logout", methods=["POST"])
 def logout():
+    print("Logout endpoint hit!", flush=True)
     try:
-        data = request.json
+        data = request.get_json()
+        if not data:
+            print("No data received in request")
+            return jsonify({"error": "Invalid request body"}), 400
+
         session_key = data.get("session_key")
 
         if not session_key:
             return jsonify({"error": "Session key is required"}), 400
 
+        # ✅ Strip and normalize session key
+        session_key = session_key.strip()
+
         conn = get_db_connection()
+
+        # ✅ Use a default cursor
         cursor = conn.cursor()
 
-        # 🛠️ Debugging log
-        print(f"Received session key: {session_key}")
+        # ✅ Set isolation level to avoid transaction visibility issues
+        cursor.execute("SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED")
 
-        # Check if session exists and is active
+        print(f"Received session key: '{session_key}'")
+
+        # ✅ Add backticks to avoid keyword conflicts
         cursor.execute(
-            "SELECT * FROM BKLWM_SESSION WHERE SESSION_KEY = %s",
+            "SELECT `SESSION_KEY` FROM `BKLWM_SESSION` WHERE `SESSION_KEY` = %s",
             (session_key,)
         )
         session = cursor.fetchone()
+        session_key_from_db = session['SESSION_KEY']
+
+        cursor.execute(
+            "SELECT `IS_ACTIVE` FROM `BKLWM_SESSION` WHERE `SESSION_KEY` = %s",
+            (session_key,)
+        )
+        active = cursor.fetchone()
+        is_active = active['IS_ACTIVE']
 
         if not session:
             print("Session not found or already inactive")
             return jsonify({"error": "Invalid or already logged out"}), 400
 
-        # 🛠️ Debugging log
-        print(f"Current IS_ACTIVE value: {session['IS_ACTIVE']}")
+        # ✅ Unpack values correctly
+        
 
-        # Deactivate the session
+        # ✅ Debug raw byte values
+        print(f"Session key from request (bytes): {session_key.encode()}")
+        print(f"Session key from DB (bytes): {session_key_from_db}")
+
+        print(f"Current IS_ACTIVE value: {is_active}")
+
+        if not is_active:
+            print("Session is already inactive")
+            return jsonify({"error": "Session already logged out"}), 400
+
+        # ✅ Fix UPDATE using backticks and direct matching
         cursor.execute(
-            "UPDATE BKLWM_SESSION SET IS_ACTIVE = %s WHERE SESSION_KEY = %s",
-            (0, session_key)  # Ensure this value matches the data type in DB
+            "UPDATE `BKLWM_SESSION` SET `IS_ACTIVE` = %s WHERE `SESSION_KEY` = %s",
+            (0, session_key_from_db)
         )
+
+        # ✅ Check if row was updated
+        if cursor.rowcount == 0:
+            print("No rows updated — possible session key mismatch or already inactive")
+            return jsonify({"error": "Session key mismatch or already inactive"}), 400
+
         conn.commit()
 
-        # Confirm update
-        cursor.execute(
-            "SELECT IS_ACTIVE FROM BKLWM_SESSION WHERE SESSION_KEY = %s",
-            (session_key,)
-        )
-        updated_session = cursor.fetchone()
-        print(f"Updated IS_ACTIVE value: {updated_session['IS_ACTIVE']}")
+        print(f"Session {session_key_from_db} deactivated successfully")
 
         cursor.close()
         conn.close()
@@ -248,8 +280,15 @@ def logout():
         return jsonify({"message": "Logout successful"}), 200
 
     except Exception as e:
-        print(f"Error during logout: {e}")
-        return jsonify({"error": str(e)}), 500
+        print(f"Error during logout: {str(e)}", flush=True)
+        return jsonify({"error": f"Server error: {str(e)}"}), 500
+
+
+
+
+
+
+
 
 
 

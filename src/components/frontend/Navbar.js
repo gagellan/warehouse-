@@ -39,18 +39,20 @@ function Navbar() {
   }, []);
 
   const handleLogout = async () => {
-    const sessionKey = localStorage.getItem("sessionKey");
+    let sessionKey = localStorage.getItem("session_key");
 
-    if (!sessionKey) {
+    if (!sessionKey || sessionKey === "null" || sessionKey === "undefined") {
         alert("You are already logged out!");
         window.location.href = "/login";
         return;
     }
 
-    try {
-        console.log("Sending session key:", sessionKey); // ✅ Debugging
+    sessionKey = sessionKey.trim(); // Remove any extra whitespace
 
-        const response = await fetch("http://localhost:5000/logout", {
+    try {
+        console.log("Sending session key:", sessionKey);
+
+        const response = await fetch("http://127.0.0.1:5000/logout", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -61,10 +63,11 @@ function Navbar() {
         const data = await response.json();
 
         if (response.ok) {
-            console.log("Logout successful"); // ✅ Debugging
-            localStorage.removeItem("sessionKey");
+            console.log("Logout successful");
+            // ✅ Fixed key name
+            localStorage.removeItem("session_key");
             localStorage.removeItem("userFirstName");
-            window.location.href = "/login"; 
+            window.location.href = "/login";
         } else {
             console.error("Logout failed:", data.error);
             alert(data.error || "Failed to log out. Please try again.");
@@ -74,6 +77,8 @@ function Navbar() {
         alert("Something went wrong. Please try again later.");
     }
 };
+
+  
 
 
 
@@ -89,7 +94,8 @@ function Navbar() {
     "/compareimages": "COMPARE IMAGES",
     "/timelapse": "TIMELAPSE",
     "/login": "LOGOUT",
-    "/vehicledashboard": "VEHICLE DASHBOARD"
+    "/vehicledashboard": "VEHICLE DASHBOARD",
+    "/logout": "Logout"
   };
 
   const currentPage = pageTitles[location.pathname];

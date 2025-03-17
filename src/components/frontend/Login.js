@@ -32,7 +32,8 @@ const Login = () => {
                 // localStorage.setItem("userEmail", formData.email);
                 // localStorage.setItem("userFirstName", formData.first_name); // Store first name
                 localStorage.setItem("userFirstName", response.data.first_name || "Guest");
-
+                // let sessionKey = localStorage.getItem("session_key");
+                // alert(sessionKey)
                 window.location.href = "/Dashboard";
             }
         } catch (error) {

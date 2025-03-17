@@ -30,6 +30,23 @@ function Navbar() {
 
   const location = useLocation();
   const [userFirstName, setUserFirstName] = useState("");
+  const [email, setUserEmail] = useState("");
+  const [showEmailBox, setShowEmailBox] = useState(false);
+
+
+  const toggleEmailBox = () => {
+    setShowEmailBox(prevState => !prevState);
+  };
+  
+
+
+
+  useEffect(() => {
+    const email = localStorage.getItem("userEmail");
+    if (email) {
+        setUserEmail(email); // ✅ Display email from localStorage
+    }
+}, []);
 
   useEffect(() => {
     const firstName = localStorage.getItem("userFirstName");
@@ -219,35 +236,29 @@ function Navbar() {
 
       {/* Top Navbar */}
       <div className="top-navbar">
-        <button className="menu-button" onClick={() => setSideMenuOpen(true)}>☰</button>
-        <h1>{currentPage}</h1>
+    <button className="menu-button" onClick={() => setSideMenuOpen(true)}>☰</button>
+    <h1>{currentPage}</h1>
 
-        {/* Right Side Icons and Profile */}
-        <div className="top-navbar-right">
-          <IoMdNotificationsOutline className="navbar-icon" />
-          <AiOutlineSetting className="navbar-icon" />
-          <BsQuestionCircle className="navbar-icon" />
+    <div className="top-navbar-right">
+      <IoMdNotificationsOutline className="navbar-icon" />
+      <AiOutlineSetting className="navbar-icon" />
+      <BsQuestionCircle className="navbar-icon" />
 
-          {/* User Profile with First Name */}
-          <div className="navbar-profile">
-            <span className="navbar-email">{userFirstName || "Guest"}</span>
-            <div className="navbar-email-icon"><VscAccount /></div>
-          </div>
-
-          {/* User Profile with Email */}
-          {/* <div className="navbar-profile">
-            <span className="navbar-email">{userEmail || "Guest"}</span>
-            <div className="navbar-email-icon"><VscAccount /></div>
-          </div> */}
-
-          {/* <div className="navbar-profile">
-            <span className="navbar-email">ramaksccL@gmail.com</span> */}
-          {/* <MdKeyboardArrowDown className="navbar-dropdown-icon" /> */}
-          {/* <div className="navbar-email-icon"><VscAccount /></div> */}
-          {/* <img src={userImage} alt="User" className="navbar-user-image" /> */}
-
-        </div>
+      <div className="navbar-profile" onClick={toggleEmailBox}>
+        <span className="navbar-email">{userFirstName || "Guest"}</span>
+        <div className="navbar-email-icon"><VscAccount /></div>
       </div>
+    </div>
+
+    {showEmailBox && (
+      <div className="email-box">
+        <span className="email-text">{email || "No Email"}</span>
+        <button className="edit-account-button" onClick={() => alert("Edit account clicked!")}>
+          Edit Account
+        </button>
+      </div>
+    )}
+  </div>
     </div>
   );
 }

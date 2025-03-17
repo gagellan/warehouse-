@@ -25,9 +25,9 @@ const VehicleDashboard = () => {
                 if (data && data.length > 0) {
                     const formattedVehicles = data.map((vehicle) => ({
                         number: vehicle.vehicle_number,
-                        npr: vehicle.npr_image
-                            ? `data:image/jpeg;base64,${vehicle.npr_image}`
-                            : null,
+                        npr: vehicle.npr_image_path
+                            ? `http://127.0.0.1:5000/plates/${vehicle.npr_image_path}`
+                            : null, // ✅ Reference Flask URL directly
                         inTime: vehicle.detection_time,
                         warehouse: "WH001", // Example data
                         gate: "Gate 1", // Example data
@@ -44,6 +44,7 @@ const VehicleDashboard = () => {
         fetchVehicles();
     }, []);
 
+
     return (
         <div className="vehicle-dashboard">
             {/* Stats Section */}
@@ -56,10 +57,21 @@ const VehicleDashboard = () => {
 
             {/* Vehicle Info (Subset Data) */}
             <section className="vehicle-info">
-                <div className="vehicle-image-grid">
-                    <img src={img1} alt="Vehicles in parking" />
-                    <img src={img2} alt="Loaded truck" />
+                <div className="live-feed">
+                    <img
+                        src="http://127.0.0.1:5000/video_feed"
+                        alt="Live Feed"
+                        style={{
+                            width: '100%',
+                            height: '300px',
+                            objectFit: 'cover',
+                            borderRadius: '8px',
+                            border: '2px solid #ccc'
+                        }}
+                    />
+
                 </div>
+
                 <div className="vehicle-list">
                     <input type="text" placeholder="Search" className="vehicle-search" />
                     <table>
@@ -73,7 +85,7 @@ const VehicleDashboard = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {allVehicles.slice(0, 2).map((vehicle, index) => ( // ✅ Limit to first 2 rows
+                            {allVehicles.slice(0, 2).map((vehicle, index) => (
                                 <tr key={index}>
                                     <td>{vehicle.number}</td>
                                     <td>{vehicle.warehouse}</td>
@@ -94,7 +106,6 @@ const VehicleDashboard = () => {
                                 </tr>
                             ))}
                         </tbody>
-
                     </table>
                 </div>
             </section>
@@ -120,7 +131,7 @@ const VehicleDashboard = () => {
                                 <td>
                                     {vehicle.npr ? (
                                         <img
-                                            src={vehicle.npr}
+                                            src={vehicle.npr} // ✅ Use vehicle.npr instead of raw path
                                             alt="NPR"
                                             style={{
                                                 width: "80px",
@@ -133,6 +144,7 @@ const VehicleDashboard = () => {
                                         <span>No Image</span>
                                     )}
                                 </td>
+
                                 <td>{vehicle.inTime}</td>
                                 <td>{vehicle.warehouse}</td>
                                 <td>{vehicle.location}</td>

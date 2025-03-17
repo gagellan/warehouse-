@@ -1,0 +1,17 @@
+[
+    {
+        "vehicle_number": "MH 04 JM 8765",
+        "npr_image_path": "2025-03-17_23-52-16.jpg",
+        "detection_time": "2025-03-17 23:52:16"
+    },
+    {
+        "vehicle_number": "MH 04 JM 8765",
+        "npr_image_path": "2025-03-18_00-01-31.jpg",
+        "detection_time": "2025-03-18 00:01:31"
+    },
+    {
+        "vehicle_number": "MH 04 JM 8765",
+        "npr_image_path": "2025-03-18_00-24-26.jpg",
+        "detection_time": "2025-03-18 00:24:26"
+    }
+]

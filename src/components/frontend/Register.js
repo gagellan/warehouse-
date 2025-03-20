@@ -50,7 +50,7 @@ const Register = () => {
       setSuccess(response.data.message);
       setError("");
       setTimeout(() => {
-        window.location.href = "/Dashboard";
+        window.location.href = "/login";
       }, 2000);
     } catch (error) {
       setError(error.response?.data?.error || "Something went wrong");

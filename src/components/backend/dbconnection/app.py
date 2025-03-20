@@ -16,17 +16,24 @@ import smtplib
 
 app = Flask(__name__)
 
-with open(r"D:\bikanelite-wm\src\components\backend\dbconnection\dbconfig.json", "r") as config_file:
-    config_data = json.load(config_file)
+# Load database 
+current_dir = os.path.dirname(os.path.abspath(__file__))
+config_path = os.path.join(current_dir, "dbconfig.json")
+
+if os.path.exists(config_path):
+    with open(config_path, "r") as config_file:
+        config_data = json.load(config_file)
+else:
+    raise FileNotFoundError(f"Config file not found at {config_path}")
 
 db_config = config_data["db_config"]
 
-# Email Configuration
-app.config["MAIL_SERVER"] = "smtp.gmail.com"  # Use your SMTP server
-app.config["MAIL_PORT"] = 587
-app.config["MAIL_USE_TLS"] = True
-app.config["MAIL_USERNAME"] = "ishasolanki0225@gmail.com"  # Your email
-app.config["MAIL_PASSWORD"] = "grcq gjmz ispg egmg"  # App password (not your actual email password)
+SMTP_SERVER = db_config["smtp"]["server"]
+SMTP_PORT = db_config["smtp"]["port"]
+SENDER_EMAIL = db_config["smtp"]["sender_email"]
+SENDER_PASSWORD = db_config["smtp"]["sender_password"]
+EMAIL_SUBJECT = db_config["email_template"]["subject"]
+EMAIL_BODY_TEMPLATE = db_config["email_template"]["body"]
 
 mail = Mail(app)
 
@@ -59,6 +66,47 @@ def generate_unique_id():
             cursor.close()
             conn.close()
             return user_id
+        
+# Send Activation Email
+def send_activation_email(to_email, token):
+    try:
+        activation_link = f"http://127.0.0.1:5000/activate/{token}"
+        
+        msg = MIMEMultipart()
+        msg["From"] = SENDER_EMAIL
+        msg["To"] = to_email
+        msg["Subject"] = EMAIL_SUBJECT
+
+        email_body = EMAIL_BODY_TEMPLATE.replace("{activation_link}", activation_link)
+        msg.attach(MIMEText(email_body, "html"))
+
+        server = smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT)
+        server.login(SENDER_EMAIL, SENDER_PASSWORD)
+        server.sendmail(SENDER_EMAIL, to_email, msg.as_string())
+        server.quit()
+
+        print(f"Activation email sent to {to_email}")
+    except Exception as e:
+        print(f"Email Error: {str(e)}")
+
+@app.route('/activate/<token>', methods=['GET'])
+def activate_account(token):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT EMAIL_ID FROM BKLWM_AUTH_USER WHERE VERIFICATION_TOKEN = %s AND IS_USER_ACTIVE = 0", (token,))
+    user = cursor.fetchone()
+
+    if user:
+        cursor.execute("UPDATE BKLWM_AUTH_USER SET IS_USER_ACTIVE = 1, VERIFICATION_TOKEN = NULL WHERE VERIFICATION_TOKEN = %s", (token,))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return redirect("http://localhost:3000/login")
+    else:
+        cursor.close()
+        conn.close()
+        return jsonify({"message": "Invalid or already activated account"}), 400
+
 
 @app.route("/register", methods=["POST"])
 def register():
@@ -88,6 +136,7 @@ def register():
         last_login = created_date  # Set last login same as created date initially
 
         username = email.split('@')[0]  # Generate username from email prefix
+        verification_token = str(uuid.uuid4())
 
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -102,11 +151,11 @@ def register():
             """
             INSERT INTO BKLWM_AUTH_USER (
                 ID, FIRST_NAME, LAST_NAME, EMAIL_ID, PASSWORD, CREATED_DATE, 
-                LAST_LOGIN, IS_USER_ACTIVE, USERNAME, MOBILE_NUMBER, COUNTRY, PHONE_CODE
+                LAST_LOGIN, IS_USER_ACTIVE, USERNAME, MOBILE_NUMBER,VERIFICATION_TOKEN, COUNTRY, PHONE_CODE
             ) 
             VALUES (
                 %(user_id)s, %(first_name)s, %(last_name)s, %(email)s, %(hashed_password)s, %(created_date)s, 
-                %(last_login)s, %(is_user_active)s, %(username)s, %(mobile_number)s, %(country)s, %(phone_code)s
+                %(last_login)s, %(is_user_active)s, %(username)s, %(mobile_number)s,%(verification_token)s, %(country)s, %(phone_code)s
             )
             """,
             {
@@ -120,6 +169,7 @@ def register():
                 "is_user_active": 1,
                 "username": username,
                 "mobile_number": mobile_number,
+                "verification_token": verification_token,
                 "country": country,
                 "phone_code": phone_code
             }
@@ -130,10 +180,20 @@ def register():
         cursor.close()
         conn.close()
 
-        return jsonify({"message": "User registered successfully", "user_id": user_id}), 201
+        # Send Activation Email
+        send_activation_email(email, verification_token)
 
+        return jsonify({
+            "message": "User registered successfully. Check your email to activate your account.",
+            "user_id": user_id,
+            "username": username
+        }), 201
+
+    except pymysql.MySQLError as db_err:
+        return jsonify({"error": f"Database error: {str(db_err)}"}), 500
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": f"Internal Server Error: {str(e)}"}), 500
+
 
 @app.route("/login", methods=["POST"])
 def login():

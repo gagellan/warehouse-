@@ -1,10 +1,11 @@
-from flask import Flask, request, jsonify
+from flask import Flask, redirect, request, jsonify
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 import pymysql
 import uuid
 import json
 import random
+
 from datetime import datetime, timedelta
 
 import smtplib
@@ -12,7 +13,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from flask_mail import Mail, Message
 import smtplib
-
+import os
 
 app = Flask(__name__)
 
@@ -28,12 +29,13 @@ else:
 
 db_config = config_data["db_config"]
 
-SMTP_SERVER = db_config["smtp"]["server"]
-SMTP_PORT = db_config["smtp"]["port"]
-SENDER_EMAIL = db_config["smtp"]["sender_email"]
-SENDER_PASSWORD = db_config["smtp"]["sender_password"]
-EMAIL_SUBJECT = db_config["email_template"]["subject"]
-EMAIL_BODY_TEMPLATE = db_config["email_template"]["body"]
+SMTP_SERVER = config_data["smtp"]["server"]  
+SMTP_PORT = config_data["smtp"]["port"]
+SENDER_EMAIL = config_data["smtp"]["sender_email"]
+SENDER_PASSWORD = config_data["smtp"]["sender_password"]
+
+EMAIL_SUBJECT = config_data["email_template"]["subject"]
+EMAIL_BODY_TEMPLATE = config_data["email_template"]["body"]
 
 mail = Mail(app)
 
@@ -166,7 +168,7 @@ def register():
                 "hashed_password": hashed_password,
                 "created_date": created_date,
                 "last_login": last_login,
-                "is_user_active": 1,
+                "is_user_active": 0,
                 "username": username,
                 "mobile_number": mobile_number,
                 "verification_token": verification_token,

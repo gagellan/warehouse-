@@ -14,6 +14,7 @@ import FloatingChat from "./components/frontend/FloatingChat"; // Import the Flo
 import DashboardLayout from "./components/frontend/DashboardLayout"; // Import the DashboardLayout component
 import Daywise from "./components/frontend/Daywise"; // Import the Images component
 import VehicleDashboard from "./components/frontend/VehicleDashboard";
+import ProtectedRoute from "./components/frontend/ProtectedRoute";
 
 
 function App() {
@@ -25,16 +26,24 @@ function App() {
         <Route path="/free-trial" element={<FreeTrialPage />} />
         <Route path="/login" element={<Login />} /> {/* Add the Login route */}
         <Route path="/register" element={<Register />} /> {/* Add the Register route */}
-        <Route path="/dashboard" element={<DashboardLayout><Dashboard /></DashboardLayout>} /> {/* Add the Dashboard route */}
-        <Route path="/images/hourwise" element={<DashboardLayout><SurveillanceDashboard /></DashboardLayout>} /> {/* Add the Images route */}
-        <Route path="/images/daywise" element={<DashboardLayout><Daywise /></DashboardLayout>} /> {/* Add the Images route */}
+        {/* <Route path="/dashboard" element={<DashboardLayout><Dashboard /></DashboardLayout>} /> 
+        <Route path="/images/hourwise" element={<DashboardLayout><SurveillanceDashboard /></DashboardLayout>} /> 
+        <Route path="/images/daywise" element={<DashboardLayout><Daywise /></DashboardLayout>} />  */}
         {/* <Route path="/images/uploads" element={<DashboardLayout><SurveillanceDashboard /></DashboardLayout>} /> 
         <Route path="/images/favorites" element={<DashboardLayout><SurveillanceDashboard /></DashboardLayout>} />*/} 
-        <Route path="/compareimages" element={<DashboardLayout><CompareImages /></DashboardLayout>} /> 
+        {/* <Route path="/compareimages" element={<DashboardLayout><CompareImages /></DashboardLayout>} /> 
         <Route path="/vehicledashboard" element={<DashboardLayout><VehicleDashboard /></DashboardLayout>} /> 
 
         <Route path="/timelapse" element={<DashboardLayout><Timelapse /></DashboardLayout>} /> 
-        <Route path="/reports" element={<DashboardLayout><Reports /></DashboardLayout>} />
+        <Route path="/reports" element={<DashboardLayout><Reports /></DashboardLayout>} /> */}
+
+      <Route path="/dashboard" element={<ProtectedRoute><DashboardLayout><Dashboard /></DashboardLayout></ProtectedRoute>} />
+      <Route path="/images/hourwise" element={<ProtectedRoute><DashboardLayout><SurveillanceDashboard /></DashboardLayout></ProtectedRoute>} />
+      <Route path="/images/daywise" element={<ProtectedRoute><DashboardLayout><Daywise /></DashboardLayout></ProtectedRoute>} />
+      <Route path="/compareimages" element={<ProtectedRoute><DashboardLayout><CompareImages /></DashboardLayout></ProtectedRoute>} />
+      <Route path="/vehicledashboard" element={<ProtectedRoute><DashboardLayout><VehicleDashboard /></DashboardLayout></ProtectedRoute>} />
+      <Route path="/timelapse" element={<ProtectedRoute><DashboardLayout><Timelapse /></DashboardLayout></ProtectedRoute>} />
+      <Route path="/reports" element={<ProtectedRoute><DashboardLayout><Reports /></DashboardLayout></ProtectedRoute>} />
       </Routes>
       {/* Floating Chat Component */}
       <FloatingChat />
@@ -43,4 +52,4 @@ function App() {
   );
 }
 
-export default App;
+export default App;

@@ -223,14 +223,14 @@ function Navbar() {
             <div id="dashboardnav-title">Vehicle Dashboard</div>
           </li>
 
-          <li
+          {/* <li
             className="dashboardnav-row"
             id={window.location.pathname === "/login" ? "dashboardnav-active" : ""}
             onClick={handleLogout}
           >
             <div id="dashboardnav-icon"><MdOutlineLogout /></div>
             <div id="dashboardnav-title">Logout</div>
-          </li>
+          </li> */}
         </ul>
       </div>
 
@@ -253,8 +253,8 @@ function Navbar() {
     {showEmailBox && (
       <div className="email-box">
         <span className="email-text">{email || "No Email"}</span>
-        <button className="edit-account-button" onClick={() => alert("Edit account clicked!")}>
-          Edit Account
+        <button className="edit-account-button" onClick={handleLogout}>
+          Logout
         </button>
       </div>
     )}

@@ -1360,9 +1360,9 @@ th, td {
   border-radius: 50%;
 }
 
-.email-box {
+/* .email-box {
   position: absolute;
-  top: 60px; /* Adjust based on navbar height */
+  top: 60px; 
   right: 10px;
   background-color: #f3f3f3;
   padding: 10px;
@@ -1392,9 +1392,70 @@ th, td {
 
 .edit-account-button:hover {
   background-color: #0056b3;
+} */
+.email-box {
+  position: absolute;
+  top: 60px;
+  right: 10px;
+  background: #fff;
+  padding: 20px; /* Increased padding for better spacing */
+  border-radius: 12px; /* Slightly more rounded corners */
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12); /* Softer & deeper shadow */
+  z-index: 1000;
+  width: 320px; /* Increased width */
+  font-family: "Arial", sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
+/* Email Text */
+.email-text {
+  font-size: 16px; /* Slightly larger text */
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 12px;
+}
 
+/* View Account (Like Google) */
+.view-account {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px; /* Larger font */
+  color: #5f6368;
+  text-decoration: none;
+  margin-bottom: 16px; /* More space below */
+  cursor: pointer;
+  transition: color 0.2s ease-in-out;
+}
+
+.view-account:hover {
+  color: #0056b3; /* Google-style blue hover */
+}
+
+/* View Account Icon */
+.external-icon {
+  font-size: 12px; /* Adjusted size */
+}
+
+/* Sign Out Button */
+.logout-button {
+  background: #0056b3; /* Google Blue */
+  color: white;
+  border: none;
+  padding: 10px 0; /* Increased padding for a larger button */
+  border-radius: 8px; /* More rounded button */
+  cursor: pointer;
+  width: 100%;
+  font-size: 14px; /* Larger font */
+  font-weight: 600;
+  transition: background 0.3s ease;
+}
+
+.logout-button:hover {
+  background: #1669c1; /* Slightly darker hover */
+}
 
 
 .menu-button {

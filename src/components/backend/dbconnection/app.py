@@ -5,6 +5,7 @@ import pymysql
 import uuid
 import json
 import random
+import requests
 
 from datetime import datetime, timedelta
 
@@ -15,7 +16,12 @@ from flask_mail import Mail, Message
 import smtplib
 import os
 
+from werkzeug.middleware.proxy_fix import ProxyFix
+
+
 app = Flask(__name__)
+# Ensure Flask trusts proxy headers
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_host=1) 
 
 # Load database 
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -195,11 +201,69 @@ def register():
         return jsonify({"error": f"Database error: {str(db_err)}"}), 500
     except Exception as e:
         return jsonify({"error": f"Internal Server Error: {str(e)}"}), 500
+    
+SESSION_FILE_PATH = "src/components/backend/dbconnection/session.json"
+    
+# Improved IP detection
+def get_client_ip():
+    headers = request.headers
+    if headers.get('X-Forwarded-For'):
+        return headers.get('X-Forwarded-For').split(',')[0].strip()
+    if headers.get('X-Real-IP'):
+        return headers.get('X-Real-IP')
+    if request.remote_addr == '127.0.0.1':
+        try:
+            return requests.get('https://api64.ipify.org').text.strip()
+        except Exception as e:
+            print(f"Error fetching external IP: {e}")
+            return "127.0.0.1"
+    return request.remote_addr
 
+# Location detection
+def get_location(ip):
+    try:
+        response = requests.get(f"https://ipinfo.io/{ip}/json", timeout=5).json()
+        loc = response.get("loc", "0,0").split(",")
+        return {
+            "city": response.get("city", "Unknown"),
+            "latitude": float(loc[0]),
+            "longitude": float(loc[1]),
+            "timezone": response.get("timezone", "UTC")
+        }
+    except Exception as e:
+        print(f"Error with ipinfo.io: {e}")
+    return {"city": "Unknown", "latitude": 0.0, "longitude": 0.0, "timezone": "UTC"}
+
+# Save session to JSON file
+def save_session_to_file(session_data):
+    try:
+        with open(SESSION_FILE_PATH, "w") as f:
+            json.dump(session_data, f, indent=4)
+        print("Session data saved to session.json")
+    except Exception as e:
+        print(f"Error saving session data: {e}")
+
+# Read session from JSON file
+def read_session_from_file():
+    try:
+        if os.path.exists(SESSION_FILE_PATH):
+            with open(SESSION_FILE_PATH, "r") as f:
+                return json.load(f)
+    except Exception as e:
+        print(f"Error reading session data: {e}")
+    return None
+
+# Delete session file
+def delete_session_file():
+    try:
+        if os.path.exists(SESSION_FILE_PATH):
+            os.remove(SESSION_FILE_PATH)
+            print("Session file deleted")
+    except Exception as e:
+        print(f"Error deleting session file: {e}")
 
 @app.route("/login", methods=["POST"])
 def login():
-    
     try:
         data = request.json
         email = data.get("email")
@@ -211,7 +275,6 @@ def login():
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # Check if user exists
         cursor.execute("SELECT * FROM BKLWM_AUTH_USER WHERE EMAIL_ID = %s", (email,))
         user = cursor.fetchone()
 
@@ -222,25 +285,31 @@ def login():
         if not bcrypt.check_password_hash(user["PASSWORD"], password):
             return jsonify({"error": "Invalid credentials"}), 401
 
-        # Update last login timestamp
+        user_ip = get_client_ip()
+        print(f"Detected IP: {user_ip}")
+
+        location_data = get_location(user_ip)
+        print(f"Location Data: {location_data}")
+
         last_login_time = datetime.now()
         cursor.execute("UPDATE BKLWM_AUTH_USER SET LAST_LOGIN = %s WHERE EMAIL_ID = %s", (last_login_time, email))
         conn.commit()
 
-        # Generate session key
         session_key = str(uuid.uuid4())
-        session_data = json.dumps({"user_id": user["ID"], "email": email})
-        expire_date = datetime.now() + timedelta(hours=2)
+        session_data = {
+            "user_id": user["ID"],
+            "ip_address": user_ip,
+            "city": location_data["city"],
+            "latitude": location_data["latitude"],
+            "longitude": location_data["longitude"],
+            "timezone": location_data["timezone"],
+            "session_key": session_key,
+            "expire_date": (datetime.now() + timedelta(hours=2)).isoformat(),
+            "created_date": last_login_time.isoformat(),
+            "is_active": 1
+        }
 
-        # Insert session into the database
-        cursor.execute(
-            """
-            INSERT INTO BKLWM_SESSION (SESSION_KEY, SESSION_DATA, EXPIRE_DATE, CREATED_DATE, IP_ADDRESS, IS_ACTIVE)
-            VALUES (%s, %s, %s, %s, %s, %s)
-            """,
-            (session_key, session_data, expire_date, last_login_time, request.remote_addr or "127.0.0.1", 1)
-        )
-        conn.commit()
+        save_session_to_file(session_data)
 
         cursor.close()
         conn.close()
@@ -256,86 +325,40 @@ def login():
         print(f"Error during login: {e}")
         return jsonify({"error": str(e)}), 500
 
-
-@app.route("/test", methods=["POST"])
-def test():
-    print("Test endpoint hit!", flush=True)
-    return jsonify({"message": "Test successful"})
-
-
 @app.route("/logout", methods=["POST"])
 def logout():
-    print("Logout endpoint hit!", flush=True)
     try:
         data = request.get_json()
-        if not data:
-            print("No data received in request")
-            return jsonify({"error": "Invalid request body"}), 400
-
-        session_key = data.get("session_key")
-
-        if not session_key:
+        if not data or "session_key" not in data:
             return jsonify({"error": "Session key is required"}), 400
 
-        # ✅ Strip and normalize session key
-        session_key = session_key.strip()
+        session_key = data["session_key"].strip()
+        session_data = read_session_from_file()
+
+        if not session_data or session_data["session_key"] != session_key:
+            return jsonify({"error": "Invalid or expired session"}), 400
 
         conn = get_db_connection()
-
-        # ✅ Use a default cursor
         cursor = conn.cursor()
 
-        # ✅ Set isolation level to avoid transaction visibility issues
-        cursor.execute("SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED")
-
-        print(f"Received session key: '{session_key}'")
-
-        # ✅ Add backticks to avoid keyword conflicts
         cursor.execute(
-            "SELECT `SESSION_KEY` FROM `BKLWM_SESSION` WHERE `SESSION_KEY` = %s",
-            (session_key,)
+            """
+            INSERT INTO BKLWM_SESSION (SESSION_KEY, SESSION_DATA, EXPIRE_DATE, CREATED_DATE, IP_ADDRESS, IS_ACTIVE)
+            VALUES (%s, %s, %s, %s, %s, %s)
+            """,
+            (
+                session_data["session_key"],
+                json.dumps(session_data),
+                session_data["expire_date"],
+                session_data["created_date"],
+                session_data["ip_address"],
+                0
+            )
         )
-        session = cursor.fetchone()
-        session_key_from_db = session['SESSION_KEY']
-
-        cursor.execute(
-            "SELECT `IS_ACTIVE` FROM `BKLWM_SESSION` WHERE `SESSION_KEY` = %s",
-            (session_key,)
-        )
-        active = cursor.fetchone()
-        is_active = active['IS_ACTIVE']
-
-        if not session:
-            print("Session not found or already inactive")
-            return jsonify({"error": "Invalid or already logged out"}), 400
-
-        # ✅ Unpack values correctly
-        
-
-        # ✅ Debug raw byte values
-        print(f"Session key from request (bytes): {session_key.encode()}")
-        print(f"Session key from DB (bytes): {session_key_from_db}")
-
-        print(f"Current IS_ACTIVE value: {is_active}")
-
-        if not is_active:
-            print("Session is already inactive")
-            return jsonify({"error": "Session already logged out"}), 400
-
-        # ✅ Fix UPDATE using backticks and direct matching
-        cursor.execute(
-            "UPDATE `BKLWM_SESSION` SET `IS_ACTIVE` = %s WHERE `SESSION_KEY` = %s",
-            (0, session_key_from_db)
-        )
-
-        # ✅ Check if row was updated
-        if cursor.rowcount == 0:
-            print("No rows updated — possible session key mismatch or already inactive")
-            return jsonify({"error": "Session key mismatch or already inactive"}), 400
 
         conn.commit()
 
-        print(f"Session {session_key_from_db} deactivated successfully")
+        delete_session_file()
 
         cursor.close()
         conn.close()
@@ -343,8 +366,14 @@ def logout():
         return jsonify({"message": "Logout successful"}), 200
 
     except Exception as e:
-        print(f"Error during logout: {str(e)}", flush=True)
-        return jsonify({"error": f"Server error: {str(e)}"}), 500
+        print(f"Error during logout: {e}")
+        return jsonify({"error": str(e)}), 500
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+
+
 
 
 

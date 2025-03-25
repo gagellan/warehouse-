@@ -3,6 +3,7 @@ import "../../assets/css/App.css";
 // import logo from '../assets/images/logo.jpg';
 import logo from '../../assets/images/logo.jpg';
 import React, { useEffect, useState } from "react";
+import { FaExternalLinkAlt } from "react-icons/fa";
 
 import { useLocation } from "react-router-dom";
 
@@ -250,14 +251,30 @@ function Navbar() {
       </div>
     </div>
 
-    {showEmailBox && (
+    {/* {showEmailBox && (
       <div className="email-box">
         <span className="email-text">{email || "No Email"}</span>
-        <button className="edit-account-button" onClick={handleLogout}>
-          Logout
+        <button className="logout-button" onClick={handleLogout}>
+          Sign out
         </button>
       </div>
-    )}
+    )} */}
+
+    {showEmailBox && (
+            <div className="email-box">
+              <span className="email-text">{email || "No Email"}</span>
+
+              {/* View Account Link */}
+              <a href="/account" className="view-account">
+                View account <FaExternalLinkAlt className="external-icon" />
+              </a>
+
+              {/* Logout Button (Smaller) */}
+              <button className="logout-button" onClick={handleLogout}>
+                Sign out
+              </button>
+            </div>
+          )}
   </div>
     </div>
   );

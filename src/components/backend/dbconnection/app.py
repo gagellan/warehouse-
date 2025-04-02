@@ -202,7 +202,9 @@ def register():
     except Exception as e:
         return jsonify({"error": f"Internal Server Error: {str(e)}"}), 500
     
-SESSION_FILE_PATH = "src/components/backend/dbconnection/session/session.json"
+# SESSION_FILE_PATH = "src/components/backend/dbconnection/session/session.json"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+SESSION_FILE_PATH = os.path.join(current_dir, "session", "session.json")
     
 # Improved IP detection
 def get_client_ip():
@@ -280,9 +282,6 @@ def login():
 
         if not user:
             return jsonify({"error": "Invalid credentials"}), 401
-        
-        if user["IS_USER_ACTIVE"] == 0:
-            return jsonify({"error": "Account not activated. Please check your email."}), 400
 
         # Verify password
         if not bcrypt.check_password_hash(user["PASSWORD"], password):

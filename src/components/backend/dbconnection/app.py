@@ -280,6 +280,9 @@ def login():
 
         if not user:
             return jsonify({"error": "Invalid credentials"}), 401
+        
+        if user["IS_USER_ACTIVE"] == 0:
+            return jsonify({"error": "Account not activated. Please check your email."}), 400
 
         # Verify password
         if not bcrypt.check_password_hash(user["PASSWORD"], password):

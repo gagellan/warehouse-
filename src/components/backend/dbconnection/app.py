@@ -202,7 +202,7 @@ def register():
     except Exception as e:
         return jsonify({"error": f"Internal Server Error: {str(e)}"}), 500
     
-SESSION_FILE_PATH = "src/components/backend/dbconnection/session.json"
+SESSION_FILE_PATH = "src/components/backend/dbconnection/session/session.json"
     
 # Improved IP detection
 def get_client_ip():

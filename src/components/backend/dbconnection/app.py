@@ -6,6 +6,9 @@ import uuid
 import json
 import random
 import requests
+import time
+import ssl
+from flask import make_response
 
 from datetime import datetime, timedelta
 
@@ -16,6 +19,7 @@ from flask_mail import Mail, Message
 import smtplib
 import os
 
+from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 
@@ -159,11 +163,11 @@ def register():
             """
             INSERT INTO BKLWM_AUTH_USER (
                 ID, FIRST_NAME, LAST_NAME, EMAIL_ID, PASSWORD, CREATED_DATE, 
-                LAST_LOGIN, IS_USER_ACTIVE, USERNAME, MOBILE_NUMBER,VERIFICATION_TOKEN, COUNTRY, PHONE_CODE
+                LAST_LOGIN, IS_USER_ACTIVE, USERNAME, MOBILE_NUMBER,VERIFICATION_TOKEN, COUNTRY, PHONE_CODE,PASSWORD_CHANGE_COUNT
             ) 
             VALUES (
                 %(user_id)s, %(first_name)s, %(last_name)s, %(email)s, %(hashed_password)s, %(created_date)s, 
-                %(last_login)s, %(is_user_active)s, %(username)s, %(mobile_number)s,%(verification_token)s, %(country)s, %(phone_code)s
+                %(last_login)s, %(is_user_active)s, %(username)s, %(mobile_number)s,%(verification_token)s, %(country)s, %(phone_code)s,%(password_change_count)s
             )
             """,
             {
@@ -179,7 +183,9 @@ def register():
                 "mobile_number": mobile_number,
                 "verification_token": verification_token,
                 "country": country,
-                "phone_code": phone_code
+                "phone_code": phone_code,
+                "password_change_count": 0 
+
             }
         )
 
@@ -264,6 +270,37 @@ def delete_session_file():
     except Exception as e:
         print(f"Error deleting session file: {e}")
 
+@app.route("/api/user/status", methods=["GET"])
+def user_status():
+    session = read_session_from_file()
+    if session.get("userId"):
+        return jsonify({
+            "isAuthenticated": True,
+            "userId": session.get("userId"),
+            "isTrialUsed": session.get("isTrialUsed", False)
+        })
+    return jsonify({"isAuthenticated": False})
+
+@app.route("/api/subscription/select-plan", methods=["POST"])
+def select_plan():
+    data = request.json
+    session = read_session_from_file()
+    session.update({
+        "selectedPlan": data.get("plan"),
+        "billingCycle": data.get("billingCycle")
+    })
+    save_session_to_file(session)
+    return jsonify({"message": "Plan selected successfully"})
+
+@app.route("/api/subscription/start-trial", methods=["POST"])
+def start_trial():
+    data = request.json
+    session = read_session_from_file()
+    session["isTrialUsed"] = True
+    session["trialEndsAt"] = data.get("trialEndsAt")
+    save_session_to_file(session)
+    return jsonify({"message": "Trial started"})
+
 @app.route("/login", methods=["POST"])
 def login():
     try:
@@ -326,6 +363,173 @@ def login():
     except Exception as e:
         print(f"Error during login: {e}")
         return jsonify({"error": str(e)}), 500
+    
+@app.after_request
+def apply_cors_headers(response):
+    response.headers["Access-Control-Allow-Origin"] = "http://localhost:3000"
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type,Authorization"
+    response.headers["Access-Control-Allow-Methods"] = "GET,POST,OPTIONS"
+    return response
+otp_store = {}  # Store OTPs temporarily
+
+def send_otp_email(to_email, otp):
+    subject = "Your OTP for Password Reset"
+    body = f"""
+    <html>
+        <body>
+            <p>Hello,</p>
+            <p>Your OTP to reset the password is: <strong>{otp}</strong></p>
+            <p>This OTP is valid for 5 minutes. If you did not request this, please ignore this email.</p>
+        </body>
+    </html>
+    """
+
+    msg = MIMEMultipart()
+    msg["From"] = SENDER_EMAIL
+    msg["To"] = to_email
+    msg["Subject"] = subject
+    msg.attach(MIMEText(body, "html"))
+
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT, context=context) as server:
+        server.login(SENDER_EMAIL, SENDER_PASSWORD)
+        server.sendmail(SENDER_EMAIL, to_email, msg.as_string())
+
+# Get absolute path to the session.json file
+def load_session_data():
+    try:
+        with open(SESSION_FILE_PATH, 'r') as f:
+            data = json.load(f)
+            print("✅ Session data loaded:", data)
+            return data
+    except FileNotFoundError:
+        print("❌ Session file not found at:", SESSION_FILE_PATH)
+        return {}
+    except json.JSONDecodeError:
+        print("❌ Session file contains invalid JSON.")
+        return {}
+
+def save_session_data(session_data):
+    try:
+        with open(SESSION_FILE_PATH, 'w') as f:
+            json.dump(session_data, f, indent=4)
+            print("✅ Session data saved at:", SESSION_FILE_PATH)
+    except Exception as e:
+        print("❌ Failed to save session:", str(e))
+
+@app.route("/reset-password-request", methods=["POST"])
+def reset_password_request():
+    if request.method == "OPTIONS":
+        return '', 200
+
+    data = request.get_json()
+    old_password = data.get("oldPassword")
+    new_password = data.get("newPassword")
+
+    # Load session and get user_id directly
+    session_data = load_session_data()
+    user_id = session_data.get("user_id")
+
+    if not user_id:
+        return jsonify({"error": "Session expired or not found"}), 401
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Fetch user by ID
+        cursor.execute("SELECT PASSWORD, EMAIL_ID FROM BKLWM_AUTH_USER WHERE ID = %s", (user_id,))
+        user = cursor.fetchone()
+
+        if not user or not bcrypt.check_password_hash(user["PASSWORD"], old_password):
+            return jsonify({"error": "Old password is incorrect"}), 400
+
+        # Generate OTP
+        otp = str(random.randint(100000, 999999))
+        email = user["EMAIL_ID"]
+        otp_store[email] = {
+            "otp": otp,
+            "timestamp": time.time(),
+            "new_password": new_password  # temporarily store the new password
+        }
+
+        # Send OTP email
+        send_otp_email(email, otp)
+        print(f"📧 OTP sent to {email}: {otp}")
+
+        return jsonify({"message": "OTP sent to your email"}), 200
+
+    except pymysql.MySQLError as db_err:
+        return jsonify({"error": f"Database error: {str(db_err)}"}), 500
+    except Exception as e:
+        return jsonify({"error": f"Internal Server Error: {str(e)}"}), 500
+    
+@app.route("/update-password", methods=["POST"])
+def update_password():
+    try:
+        data = request.get_json()
+        otp = data.get("otp")
+        
+        # Load user_id from session
+        session_data = load_session_data()
+        user_id = session_data.get("user_id")
+        if not user_id:
+            return jsonify({"error": "User not authenticated"}), 401
+        
+        
+
+        # Fetch user's email from DB
+        conn = get_db_connection()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)  # to access keys like a dictionary
+        cursor.execute("SELECT EMAIL_ID ,PASSWORD_CHANGE_COUNT FROM BKLWM_AUTH_USER WHERE ID = %s", (user_id,))
+        user = cursor.fetchone()
+        cursor.close()
+        conn.close()
+
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        email = user["EMAIL_ID"]
+        current_count = user.get("PASSWORD_CHANGE_COUNT", 0)
+
+        # Check if OTP exists for this email
+        otp_data = otp_store.get(email)
+        if not otp_data:
+            print("❌ No OTP data found for:", email)
+            return jsonify({"error": "Invalid or expired OTP"}), 400
+
+        # Debug print to verify OTP comparison
+        print("🔐 Received OTP:", otp)
+        print("📦 Stored OTP:", otp_data["otp"])
+
+        # Check if OTP matches
+        if str(otp_data["otp"]) != str(otp).strip():
+            return jsonify({"error": "Invalid OTP"}), 400
+
+        # Check if OTP is expired
+        if time.time() - otp_data["timestamp"] > 300:
+            otp_store.pop(email, None)
+            return jsonify({"error": "OTP expired"}), 400
+
+        # Hash and update the new password
+        new_password = otp_data["new_password"]
+        hashed_password = bcrypt.generate_password_hash(new_password).decode("utf-8")
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("UPDATE BKLWM_AUTH_USER SET PASSWORD = %s,PASSWORD_CHANGE_COUNT = %s WHERE ID = %s", (hashed_password, current_count + 1,user_id))
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        # Clear OTP
+        otp_store.pop(email, None)
+
+        return jsonify({"message": "Password updated successfully"}), 200
+
+    except Exception as e:
+        return jsonify({"error": f"Internal Server Error: {str(e)}"}), 500
 
 @app.route("/logout", methods=["POST"])
 def logout():

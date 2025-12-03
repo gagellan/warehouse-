@@ -1,34 +1,50 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import "../../assets/css/App.css";
 
 const PlanPage = () => {
   const [isYearly, setIsYearly] = useState(false);
+  const navigate = useNavigate();
 
   const pricing = {
-    Basic: { monthly: 19, yearly: 205 }, // 10% discount applied
+    Basic: { monthly: 19, yearly: 205 },
     Standard: { monthly: 39, yearly: 420 },
     Business: { monthly: 79, yearly: 850 }
   };
 
-  useEffect(() => {
-    const handleSubscriptionClick = (event) => {
-      const selectedPlan = event.target.dataset.plan;
-      if (selectedPlan) {
-        localStorage.setItem("selectedPlan", selectedPlan);
-        window.location.href = "vehicle.html";
+  const handleSelectPlan = async (selectedPlan) => {
+    if (selectedPlan === "Basic") {
+      // Redirect to plan-details page with query parameters
+      navigate(`/plan-details?plan=${selectedPlan}&billing=${isYearly ? "yearly" : "monthly"}`);
+      return;
+    }
+
+    try {
+      const res = await axios.get("http://localhost:5000/api/user/status", { withCredentials: true });
+      const { isAuthenticated, userId } = res.data;
+
+      if (!isAuthenticated) {
+        navigate("/register");
+        return;
       }
-    };
 
-    document.querySelectorAll(".plan-subscribe").forEach(button => {
-      button.addEventListener("click", handleSubscriptionClick);
-    });
+      await axios.post(
+        "http://localhost:5000/api/subscription/select-plan",
+        {
+          userId,
+          plan: selectedPlan,
+          billingCycle: isYearly ? "yearly" : "monthly"
+        },
+        { withCredentials: true }
+      );
 
-    return () => {
-      document.querySelectorAll(".plan-subscribe").forEach(button => {
-        button.removeEventListener("click", handleSubscriptionClick);
-      });
-    };
-  }, []);
+      navigate("/subscription");
+    } catch (err) {
+      console.error("Error selecting plan:", err.response?.data || err.message);
+      alert("Something went wrong. Please try again.");
+    }
+  };
 
   return (
     <div className="plan-container">
@@ -36,29 +52,46 @@ const PlanPage = () => {
         <h1>Choose a Subscription Plan</h1>
         <p>Select the best plan for your warehouse monitoring needs.</p>
 
-        {/* Toggle Switch */}
         <div className="plan-toggle-container">
           <span className="toggle-label">MONTHLY</span>
           <label className="plan-switch">
-            <input type="checkbox" onChange={() => setIsYearly(!isYearly)} />
+            <input
+              type="checkbox"
+              onChange={() => setIsYearly(!isYearly)}
+              checked={isYearly}
+            />
             <span className="plan-slider"></span>
           </label>
-          <span className="toggle-label">YEARLY <small>Save 10%</small></span>
+          <span className="toggle-label">
+            YEARLY <small>Save 10%</small>
+          </span>
         </div>
 
-        {/* Pricing Plans */}
         <div className="plan-plans">
           {Object.entries(pricing).map(([plan, prices]) => (
-            <div className="plan-box" key={plan} style={{
-              borderTopColor: plan === "Basic" ? "#ADD8E6" : plan === "Standard" ? "#FFB6C1" : "#08d8a4",
-            }}>
+            <div
+              className="plan-box"
+              key={plan}
+              style={{
+                borderTopColor:
+                  plan === "Basic"
+                    ? "#ADD8E6"
+                    : plan === "Standard"
+                    ? "#FFB6C1"
+                    : "#08d8a4"
+              }}
+            >
               <h2>{plan}</h2>
               <p className="plan-price">
                 ${isYearly ? prices.yearly : prices.monthly}
                 <span>{isYearly ? "/yr" : "/mo"}</span>
               </p>
               <p className="plan-discount">
-                Save {isYearly ? `$${(prices.monthly * 12 - prices.yearly)}` : "$0"}/year
+                Save{" "}
+                {isYearly
+                  ? `$${prices.monthly * 12 - prices.yearly}`
+                  : "$0"}
+                /year
               </p>
               <ul className="plan-features">
                 {plan === "Basic" && (
@@ -67,6 +100,9 @@ const PlanPage = () => {
                     <li>2 Cameras</li>
                     <li>Basic Analytics</li>
                     <li className="plan-disabled">AI Predictions</li>
+                    <li>
+                      <strong>7-day Free Trial</strong>
+                    </li>
                   </>
                 )}
                 {plan === "Standard" && (
@@ -86,7 +122,10 @@ const PlanPage = () => {
                   </>
                 )}
               </ul>
-              <button className="plan-subscribe" data-plan={plan}>
+              <button
+                className="plan-subscribe"
+                onClick={() => handleSelectPlan(plan)}
+              >
                 Select {plan}
               </button>
             </div>

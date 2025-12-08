@@ -15,6 +15,8 @@ import DashboardLayout from "./components/frontend/DashboardLayout"; // Import t
 import Daywise from "./components/frontend/Daywise"; // Import the Images component
 import VehicleDashboard from "./components/frontend/VehicleDashboard";
 import ProtectedRoute from "./components/frontend/ProtectedRoute";
+import ViewAccount from "./components/frontend/ViewAccount";
+import PlanDetail from "./components/frontend/PlanDetail";
 
 
 function App() {
@@ -44,6 +46,8 @@ function App() {
       <Route path="/vehicledashboard" element={<ProtectedRoute><DashboardLayout><VehicleDashboard /></DashboardLayout></ProtectedRoute>} />
       <Route path="/timelapse" element={<ProtectedRoute><DashboardLayout><Timelapse /></DashboardLayout></ProtectedRoute>} />
       <Route path="/reports" element={<ProtectedRoute><DashboardLayout><Reports /></DashboardLayout></ProtectedRoute>} />
+      <Route path="/account" element={<ViewAccount />} />
+      <Route path="/plan-details" element={<PlanDetail/>} />
       </Routes>
       {/* Floating Chat Component */}
       <FloatingChat />

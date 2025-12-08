@@ -33,6 +33,8 @@ function Navbar() {
   const [userFirstName, setUserFirstName] = useState("");
   const [email, setUserEmail] = useState("");
   const [showEmailBox, setShowEmailBox] = useState(false);
+  const handleViewAccount = () => {
+    navigate("/account");};
 
 
   const toggleEmailBox = () => {
@@ -264,10 +266,12 @@ function Navbar() {
             <div className="email-box">
               <span className="email-text">{email || "No Email"}</span>
 
-              {/* View Account Link */}
-              <a href="/account" className="view-account">
-                View account <FaExternalLinkAlt className="external-icon" />
-              </a>
+              
+
+              {/* View Account Button */}
+              <button className="view-account" onClick={handleViewAccount}>
+               View account <FaExternalLinkAlt className="external-icon" />
+              </button>
 
               {/* Logout Button (Smaller) */}
               <button className="logout-button" onClick={handleLogout}>

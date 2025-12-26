@@ -1,49 +1,26 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import "../../assets/css/App.css";
 
 const PlanPage = () => {
   const [isYearly, setIsYearly] = useState(false);
   const navigate = useNavigate();
 
+  // ⭐ UPDATED: Added "Advanced" Plan
   const pricing = {
     Basic: { monthly: 19, yearly: 205 },
     Standard: { monthly: 39, yearly: 420 },
-    Business: { monthly: 79, yearly: 850 }
+    Business: { monthly: 79, yearly: 850 },
+    Advanced: { monthly: 129, yearly: 1350 } // NEW PLAN
   };
 
-  const handleSelectPlan = async (selectedPlan) => {
-    if (selectedPlan === "Basic") {
-      // Redirect to plan-details page with query parameters
-      navigate(`/plan-details?plan=${selectedPlan}&billing=${isYearly ? "yearly" : "monthly"}`);
-      return;
-    }
-
-    try {
-      const res = await axios.get("http://localhost:5000/api/user/status", { withCredentials: true });
-      const { isAuthenticated, userId } = res.data;
-
-      if (!isAuthenticated) {
-        navigate("/register");
-        return;
-      }
-
-      await axios.post(
-        "http://localhost:5000/api/subscription/select-plan",
-        {
-          userId,
-          plan: selectedPlan,
-          billingCycle: isYearly ? "yearly" : "monthly"
-        },
-        { withCredentials: true }
-      );
-
-      navigate("/subscription");
-    } catch (err) {
-      console.error("Error selecting plan:", err.response?.data || err.message);
-      alert("Something went wrong. Please try again.");
-    }
+  // ⭐ ALL PLANS → PLAN DETAIL PAGE
+  const handleSelectPlan = (selectedPlan) => {
+    navigate(
+      `/plan-details?plan=${selectedPlan}&billing=${
+        isYearly ? "yearly" : "monthly"
+      }`
+    );
   };
 
   return (
@@ -52,6 +29,7 @@ const PlanPage = () => {
         <h1>Choose a Subscription Plan</h1>
         <p>Select the best plan for your warehouse monitoring needs.</p>
 
+        {/* Toggle */}
         <div className="plan-toggle-container">
           <span className="toggle-label">MONTHLY</span>
           <label className="plan-switch">
@@ -67,6 +45,7 @@ const PlanPage = () => {
           </span>
         </div>
 
+        {/* PLANS */}
         <div className="plan-plans">
           {Object.entries(pricing).map(([plan, prices]) => (
             <div
@@ -78,14 +57,21 @@ const PlanPage = () => {
                     ? "#ADD8E6"
                     : plan === "Standard"
                     ? "#FFB6C1"
-                    : "#08d8a4"
+                    : plan === "Business"
+                    ? "#08d8a4"
+                    : "#9b59b6" // ⭐ ADVANCED PLAN COLOR
               }}
             >
-              <h2>{plan}</h2>
+              {/* ⭐ ALIGNED PLAN TITLE */}
+              <div className="plan-title">{plan}</div>
+
+              {/* ⭐ OLD-STYLE PRICE BLOCK RESTORED */}
               <p className="plan-price">
                 ${isYearly ? prices.yearly : prices.monthly}
                 <span>{isYearly ? "/yr" : "/mo"}</span>
               </p>
+
+              {/* ⭐ DISCOUNT */}
               <p className="plan-discount">
                 Save{" "}
                 {isYearly
@@ -93,6 +79,8 @@ const PlanPage = () => {
                   : "$0"}
                 /year
               </p>
+
+              {/* FEATURES SECTION */}
               <ul className="plan-features">
                 {plan === "Basic" && (
                   <>
@@ -105,6 +93,7 @@ const PlanPage = () => {
                     </li>
                   </>
                 )}
+
                 {plan === "Standard" && (
                   <>
                     <li>3 Warehouses</li>
@@ -113,6 +102,7 @@ const PlanPage = () => {
                     <li className="plan-disabled">AI Predictions</li>
                   </>
                 )}
+
                 {plan === "Business" && (
                   <>
                     <li>10 Warehouses</li>
@@ -121,7 +111,20 @@ const PlanPage = () => {
                     <li>24/7 Monitoring</li>
                   </>
                 )}
+
+                {plan === "Advanced" && (
+                  <>
+                    <li>20 Warehouses</li>
+                    <li>30 Cameras</li>
+                    <li>AI Predictions</li>
+                    <li>Advanced Analytics</li>
+                    <li>24/7 Monitoring</li>
+                    <li>Priority Support</li>
+                  </>
+                )}
               </ul>
+
+              {/* SELECT BUTTON */}
               <button
                 className="plan-subscribe"
                 onClick={() => handleSelectPlan(plan)}

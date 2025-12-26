@@ -9,7 +9,7 @@ const Footer = () => {
   return (
     <footer className="footer-container">
       <div className="footer-left">
-        <img src="/logo.png" alt="WM Logo" className="footer-logo" />
+        <img src={require('../../assets/images/logo.jpg')} alt="WM Logo" className="footer-logo" />
         <p className="footer-description">
           AI-driven platform designed to optimize warehouse security, automate monitoring, and improve operational efficiency.
         </p>
@@ -21,9 +21,16 @@ const Footer = () => {
             <i className="fab fa-youtube"></i>
           </a>
         </div>
-        <button className="footer-contact-button">
-          CONTACT US <span className="footer-arrow">→</span>
-        </button>
+        <a 
+  href="https://www.gagellan.com/contactus.php"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="footer-contact-button"
+  style={{ textDecoration: "none" }}
+>
+  CONTACT US <span className="footer-arrow">→</span>
+</a>
+
       </div>
 
       <div className="footer-right">
@@ -53,7 +60,12 @@ const Footer = () => {
         <div className="footer-column">
           <h4 className="footer-heading">WHO WE ARE</h4>
           <ul>
-            <li><a href="#">About us</a></li>
+            <li>
+  <a href="https://www.gagellan.com/About/AboutUs.php" target="_blank" rel="noopener noreferrer">
+    About us
+  </a>
+</li>
+
             <li><a href="#">News</a></li>
             <li><a href="#">Awards</a></li>
             <li><a href="#">Events</a></li>
@@ -64,7 +76,16 @@ const Footer = () => {
         <div className="footer-column">
           <h4 className="footer-heading">CAREERS</h4>
           <ul>
-            <li><a href="#">Working at Gagellan</a></li>
+            <li>
+  <a 
+    href="https://www.gagellan.com/Carees/workculture.php" 
+    target="_blank" 
+    rel="noopener noreferrer"
+  >
+    Working at Gagellan
+  </a>
+</li>
+
             <li><a href="#">Our teams</a></li>
             {/* <li><a href="#">How we hire</a></li>
             <li><a href="#">Students and graduates</a></li> */}
@@ -97,7 +118,7 @@ const Footer = () => {
 
       <div className="footer-bottom">
         <p>
-          <a href="#">Privacy policy</a> | <a href="#">Terms of use</a>{" "}
+          <a href="https://www.gagellan.com/privacypolicy.php">Privacy policy</a> | <a href="https://www.gagellan.com/termofuse.php">Terms of use</a>{" "}
         </p>
         <p>Copyright © 2024-2026 Gagellan.com All Rights Reserved</p>
       </div>

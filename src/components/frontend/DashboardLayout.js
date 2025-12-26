@@ -1,13 +1,16 @@
-import React from "react";
-import Navbar from "./Navbar"; // Import the Navbar component
-import TopNavbar from "./TopNavbar"; // Import the TopNavbar component
+import React, { useState } from "react";
+import Navbar from "./Navbar";
 
 const DashboardLayout = ({ children }) => {
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
   return (
-    <div>
-      <Navbar /> {/* Render the Navbar */}
-      {/* <TopNavbar /> Render the TopNavbar */}
-      <div style={{ padding: "20px" }}>
+    <div className="dashboard-layout">
+      {/* Navbar contains sidebar + top menu */}
+      <Navbar onCollapseChange={setSidebarCollapsed} />
+
+      {/* Main content */}
+      <div className={`dashboard-content ${sidebarCollapsed ? "collapsed" : ""}`}>
         {children}
       </div>
     </div>

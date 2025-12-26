@@ -7,10 +7,10 @@
     },
     
     "smtp": {
-        "server": "mail.ejaikisan.com",
+        "server": "mail.aigagellan.com",
         "port": 465,
-        "sender_email": "account.security@wmdev.aigagellan.com",
-        "sender_password": "Hn2{uxk%KP_e"
+        "sender_email": "registration-wm@aigagellan.com",
+        "sender_password": "^n507Q>9D@-f"
         },
     "email_template": {
         "subject": "Activate Your Account",

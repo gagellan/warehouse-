@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, Response
 from flask_cors import cross_origin, CORS
-import mysql.connector
+#import mysql.connector
 import json
 import base64
 import cv2

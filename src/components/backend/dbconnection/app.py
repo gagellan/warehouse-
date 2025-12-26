@@ -516,7 +516,7 @@ def forgot_password():
         return jsonify({"error": str(e)}), 500
 
 
-@app.route("/reset-password", methods=["POST", "OPTIONS"])
+@app.route("/reset-password", methods=["POST"])
 def reset_password():
     try:
         data = request.json
@@ -532,7 +532,7 @@ def reset_password():
             return jsonify({"error": "Passwords do not match"}), 400
 
         conn = get_db_connection()
-        cursor = conn.cursor()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)#empty it once
 
         # Fetch stored OTP from RESET_OTP column
         cursor.execute("SELECT * FROM BKLWM_AUTH_USER WHERE EMAIL_ID = %s", (email,))

@@ -1,31 +1,40 @@
 .time-slider-container {
     display: flex;
     align-items: center;
+    justify-content: center;
     background: #fff;
     padding: 10px;
     border-radius: 10px;
     box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-    width: 1800px;
+    width: 100%;
+    max-width: 1800px;
     margin: auto;
+    gap: 15px;
+    flex-wrap: wrap;
+    box-sizing: border-box;
 }
 
 .date-picker {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 10px;
     font-size: 35px;
     font-weight: bold;
     color: #333;
+    flex-wrap: wrap;
+    min-width: 200px;
 }
 
 .slider-container {
     flex: 1;
     padding: 0 20px;
+    min-width: 200px;
 }
 
 /* Change the thumb (slider point) to blue */
 .MuiSlider-thumb {
-    color: blue !important;  /* Makes the thumb blue */
+    color: blue !important;
 }
 
 /* Keep the active track (selected line) transparent */
@@ -36,7 +45,7 @@
 
 /* Keep the rail (inactive line) a light gray */
 .MuiSlider-rail {
-    background-color: #ccc !important; /* Light gray */
+    background-color: #ccc !important;
 }
 
 /* Remove any outline when focused */
@@ -45,4 +54,61 @@
 .MuiSlider-thumb:hover {
     box-shadow: none !important;
     outline: none !important;
+}
+
+/* Tablet responsiveness (768px) */
+@media (max-width: 768px) {
+    .time-slider-container {
+        padding: 8px;
+        gap: 10px;
+    }
+
+    .date-picker {
+        font-size: 28px;
+        gap: 8px;
+        min-width: 150px;
+    }
+
+    .slider-container {
+        padding: 0 10px;
+        flex: 1;
+        min-width: 150px;
+    }
+}
+
+/* Mobile Large (480px) */
+@media (max-width: 480px) {
+    .time-slider-container {
+        flex-direction: column;
+        padding: 6px;
+        gap: 8px;
+    }
+
+    .date-picker {
+        font-size: 24px;
+        gap: 6px;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .slider-container {
+        width: 100%;
+        padding: 0 8px;
+    }
+}
+
+/* Mobile Small (360px) */
+@media (max-width: 360px) {
+    .time-slider-container {
+        padding: 5px;
+    }
+
+    .date-picker {
+        font-size: 20px;
+        gap: 4px;
+    }
+
+    .slider-container {
+        padding: 0 5px;
+    }
 }

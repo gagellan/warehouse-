@@ -1,106 +1,91 @@
-// import React, { useState } from 'react';
 import "../../assets/css/App.css";
-// import logo from '../assets/images/logo.jpg';
-import logo from '../../assets/images/logo.jpg';
 import React, { useEffect, useState } from "react";
-import { FaExternalLinkAlt } from "react-icons/fa";
+import logo from '../../assets/images/logo.jpg';
 
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import { IoHomeOutline } from "react-icons/io5";
 import { IoImagesOutline } from "react-icons/io5";
 import { MdOutlineCompare } from "react-icons/md";
 import { MdOutlineTimelapse } from "react-icons/md";
 import { TbReportAnalytics } from "react-icons/tb";
-import { MdOutlineLogout } from "react-icons/md";
-import { MdKeyboardArrowDown } from "react-icons/md";
+import { MdKeyboardArrowRight } from "react-icons/md";
 import { TbClockHour5Filled } from "react-icons/tb";
 import { MdOutlineToday } from "react-icons/md";
 import { LuInfinity } from "react-icons/lu";
-import { useNavigate } from "react-router-dom";
 import { FaTruck } from "react-icons/fa6";
+
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { AiOutlineSetting } from "react-icons/ai";
 import { BsQuestionCircle } from "react-icons/bs";
 import { VscAccount } from "react-icons/vsc";
-import userImage from '../../assets/images/user.jpg'; // Add user image
+import { FaExternalLinkAlt } from "react-icons/fa";
 
-function Navbar() {
+import userImage from '../../assets/images/user.jpg';
 
 
+function Navbar({ onCollapseChange }) {
 
   const location = useLocation();
+  const navigate = useNavigate();
+
   const [userFirstName, setUserFirstName] = useState("");
   const [email, setUserEmail] = useState("");
   const [showEmailBox, setShowEmailBox] = useState(false);
-  const handleViewAccount = () => {
-    navigate("/account");};
 
-
-  const toggleEmailBox = () => {
-    setShowEmailBox(prevState => !prevState);
-  };
-  
-
-
+  const [dropdownOpen, setDropdownOpen] = useState(true); 
+  const [sideMenuOpen, setSideMenuOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   useEffect(() => {
     const email = localStorage.getItem("userEmail");
-    if (email) {
-        setUserEmail(email); // ✅ Display email from localStorage
-    }
-}, []);
+    if (email) setUserEmail(email);
+  }, []);
 
   useEffect(() => {
     const firstName = localStorage.getItem("userFirstName");
-    if (firstName) {
-      setUserFirstName(firstName);
-    }
+    if (firstName) setUserFirstName(firstName);
   }, []);
+
+  const toggleEmailBox = () => {
+    setShowEmailBox(prev => !prev);
+  };
+
+  const handleViewAccount = () => {
+    navigate("/account");
+  };
 
   const handleLogout = async () => {
     let sessionKey = localStorage.getItem("session_key");
 
     if (!sessionKey || sessionKey === "null" || sessionKey === "undefined") {
-        alert("You are already logged out!");
-        window.location.href = "/login";
-        return;
+      alert("You are already logged out!");
+      window.location.href = "/login";
+      return;
     }
 
-    sessionKey = sessionKey.trim(); // Remove any extra whitespace
+    sessionKey = sessionKey.trim();
 
     try {
-        console.log("Sending session key:", sessionKey);
+      const response = await fetch("http://127.0.0.1:5000/logout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ session_key: sessionKey }),
+      });
 
-        const response = await fetch("http://127.0.0.1:5000/logout", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ session_key: sessionKey }),
-        });
+      const data = await response.json();
 
-        const data = await response.json();
-
-        if (response.ok) {
-            console.log("Logout successful");
-            // ✅ Fixed key name
-            localStorage.removeItem("session_key");
-            localStorage.removeItem("userFirstName");
-            window.location.href = "/login";
-        } else {
-            console.error("Logout failed:", data.error);
-            alert(data.error || "Failed to log out. Please try again.");
-        }
+      if (response.ok) {
+        localStorage.removeItem("session_key");
+        localStorage.removeItem("userFirstName");
+        window.location.href = "/login";
+      } else {
+        alert(data.error || "Failed to log out. Please try again.");
+      }
     } catch (error) {
-        console.error("Logout error:", error);
-        alert("Something went wrong. Please try again later.");
+      alert("Something went wrong. Please try again later.");
     }
-};
-
-  
-
-
+  };
 
   const pageTitles = {
     "/": "DASHBOARD",
@@ -120,79 +105,71 @@ function Navbar() {
 
   const currentPage = pageTitles[location.pathname];
 
+  const toggleSidebarCollapse = () => {
+    setSidebarCollapsed(prev => !prev);
+    if (onCollapseChange) onCollapseChange(!sidebarCollapsed);
+  };
 
-
-
-  const [dropdownOpen, setDropdownOpen] = useState(false); // State for dropdown
-  const [sideMenuOpen, setSideMenuOpen] = useState(false); // State for side menu
-  const navigate = useNavigate();
-
-  // const Navbar = () => {
-  //   const [userEmail, setUserEmail] = useState("");
-
-  //   useEffect(() => {
-  //       const email = localStorage.getItem("userEmail");
-  //       if (email) {
-  //           setUserEmail(email);
-  //       }
-  //   }, []);
-
+  const handleOverlayClick = () => setSideMenuOpen(false);
 
   return (
     <div>
-      <div className={`dashboardnav-sidebar ${sideMenuOpen ? 'open' : ''}`}>
-        <button className="close-button" onClick={() => setSideMenuOpen(false)}>☰</button>
-        {/* <div className="user-info">
-          <img src={userImage} alt="User" className="user-image" />
-          <span className="username">John Doe</span>
-        </div> */}
+
+      {/* Sidebar Overlay (Mobile) */}
+      {sideMenuOpen && (
+        <div className="sidebar-overlay active" onClick={handleOverlayClick}></div>
+      )}
+
+      {/* Sidebar */}
+      <div className={`dashboardnav-sidebar ${sideMenuOpen ? 'open' : ''} ${sidebarCollapsed ? 'collapsed' : ''}`}>
+
+        {/* CLEAN HAMBURGER BUTTON */}
+        <button className="sidebar-toggle-btn" onClick={toggleSidebarCollapse}>
+          ☰
+        </button>
+
+        {/* Mobile Close Button */}
+        <button className="close-button" onClick={() => setSideMenuOpen(false)}>✕</button>
+
         <ul className="dashboardnav-SidebarList">
-          {/* Dashboard */}
+
           <li
             className="dashboardnav-row"
-            id={window.location.pathname === '/dashboard' ? 'dashboardnav-active' : ''}
+            data-tooltip="Dashboard"
+            id={location.pathname === '/dashboard' ? 'dashboardnav-active' : ''}
             onClick={() => navigate('/dashboard')}
           >
             <div id="dashboardnav-icon"><IoHomeOutline /></div>
             <div id="dashboardnav-title">Dashboard</div>
           </li>
 
-          {/* Images with Dropdown */}
-          <li className="dashboardnav-row"
-            id={window.location.pathname.startsWith('/images') ? 'dashboardnav-active' : ''}
-            onClick={() => setDropdownOpen(!dropdownOpen)}
+          <li
+            className="dashboardnav-row"
+            data-tooltip="Gallery"
+            id={location.pathname.startsWith('/images') ? 'dashboardnav-active' : ''}
+            onClick={() => navigate('/images/hourwise')}
           >
             <div id="dashboardnav-icon"><IoImagesOutline /></div>
             <div id="dashboardnav-title">Gallery</div>
-            <div id="dashboardnav-arrow" className={dropdownOpen ? 'dashboardnav-rotate' : ''} ><MdKeyboardArrowDown /></div>
+            <div id="dashboardnav-arrow"><MdKeyboardArrowRight /></div>
           </li>
-          {dropdownOpen && (
-            <ul className="dashboardnav-nested-list">
-              <li
-                className="dashboardnav-nested-item"
-                onClick={() => navigate('/images/hourwise')}
-              >
-                <span className="dashboardnav-nested-icon"><TbClockHour5Filled /></span> Hour Wise
-              </li>
-              <li
-                className="dashboardnav-nested-item"
-                onClick={() => navigate('/images/daywise')}
-              >
-                <span className="dashboardnav-nested-icon"><MdOutlineToday /></span> Day Wise
-              </li>
-              <li
-                className="dashboardnav-nested-item"
-                onClick={() => navigate('/images/custom')}
-              >
-                <span className="dashboardnav-nested-icon"><LuInfinity /></span> Custom
-              </li>
-            </ul>
-          )}
 
-          {/* Compare Images */}
+          <ul className="dashboardnav-nested-list">
+            <li className="dashboardnav-nested-item" onClick={() => navigate('/images/hourwise')}>
+              <span className="dashboardnav-nested-icon"><TbClockHour5Filled /></span> Hour Wise
+            </li>
+            <li className="dashboardnav-nested-item" onClick={() => navigate('/images/daywise')}>
+              <span className="dashboardnav-nested-icon"><MdOutlineToday /></span> Day Wise
+            </li>
+            <li className="dashboardnav-nested-item" onClick={() => navigate('/images/custom')}>
+              <span className="dashboardnav-nested-icon"><LuInfinity /></span> Custom
+            </li>
+          </ul>
+
           <li
             className="dashboardnav-row"
-            id={window.location.pathname === '/compareimages' ? 'dashboardnav-active' : ''}
+            data-tooltip="Compare Images"
+            id={location.pathname === '/compareimages' ? 'dashboardnav-active' : ''}
             onClick={() => navigate('/compareimages')}
           >
             <div id="dashboardnav-icon"><MdOutlineCompare /></div>
@@ -201,7 +178,8 @@ function Navbar() {
 
           <li
             className="dashboardnav-row"
-            id={window.location.pathname === '/timelapse' ? 'dashboardnav-active' : ''}
+            data-tooltip="Timelapse"
+            id={location.pathname === '/timelapse' ? 'dashboardnav-active' : ''}
             onClick={() => navigate('/timelapse')}
           >
             <div id="dashboardnav-icon"><MdOutlineTimelapse /></div>
@@ -210,7 +188,8 @@ function Navbar() {
 
           <li
             className="dashboardnav-row"
-            id={window.location.pathname === '/reports' ? 'dashboardnav-active' : ''}
+            data-tooltip="Reports"
+            id={location.pathname === '/reports' ? 'dashboardnav-active' : ''}
             onClick={() => navigate('/reports')}
           >
             <div id="dashboardnav-icon"><TbReportAnalytics /></div>
@@ -219,67 +198,48 @@ function Navbar() {
 
           <li
             className="dashboardnav-row"
-            id={window.location.pathname === '/vehicledashboard' ? 'dashboardnav-active' : ''}
+            data-tooltip="Vehicle Dashboard"
+            id={location.pathname === '/vehicledashboard' ? 'dashboardnav-active' : ''}
             onClick={() => navigate('/vehicledashboard')}
           >
             <div id="dashboardnav-icon"><FaTruck /></div>
             <div id="dashboardnav-title">Vehicle Dashboard</div>
           </li>
 
-          {/* <li
-            className="dashboardnav-row"
-            id={window.location.pathname === "/login" ? "dashboardnav-active" : ""}
-            onClick={handleLogout}
-          >
-            <div id="dashboardnav-icon"><MdOutlineLogout /></div>
-            <div id="dashboardnav-title">Logout</div>
-          </li> */}
         </ul>
       </div>
 
-      {/* Top Navbar */}
+      {/* TOP NAVBAR */}
       <div className="top-navbar">
-    <button className="menu-button" onClick={() => setSideMenuOpen(true)}>☰</button>
-    <h1>{currentPage}</h1>
+        <button className="menu-button" onClick={() => setSideMenuOpen(true)}>☰</button>
+        <h1>{currentPage}</h1>
 
-    <div className="top-navbar-right">
-      <IoMdNotificationsOutline className="navbar-icon" />
-      <AiOutlineSetting className="navbar-icon" />
-      <BsQuestionCircle className="navbar-icon" />
+        <div className="top-navbar-right">
+          <IoMdNotificationsOutline className="navbar-icon" />
+          <AiOutlineSetting className="navbar-icon" />
+          <BsQuestionCircle className="navbar-icon" />
 
-      <div className="navbar-profile" onClick={toggleEmailBox}>
-        <span className="navbar-email">{userFirstName || "Guest"}</span>
-        <div className="navbar-email-icon"><VscAccount /></div>
+          <div className="navbar-profile" onClick={toggleEmailBox}>
+            <span className="navbar-email">{userFirstName || "Guest"}</span>
+            <div className="navbar-email-icon"><VscAccount /></div>
+          </div>
+        </div>
+
+        {showEmailBox && (
+          <div className="email-box">
+            <span className="email-text">{email || "No Email"}</span>
+
+            <button className="view-account" onClick={handleViewAccount}>
+              View account <FaExternalLinkAlt className="external-icon" />
+            </button>
+
+            <button className="logout-button" onClick={handleLogout}>
+              Sign out
+            </button>
+          </div>
+        )}
       </div>
-    </div>
 
-    {/* {showEmailBox && (
-      <div className="email-box">
-        <span className="email-text">{email || "No Email"}</span>
-        <button className="logout-button" onClick={handleLogout}>
-          Sign out
-        </button>
-      </div>
-    )} */}
-
-    {showEmailBox && (
-            <div className="email-box">
-              <span className="email-text">{email || "No Email"}</span>
-
-              
-
-              {/* View Account Button */}
-              <button className="view-account" onClick={handleViewAccount}>
-               View account <FaExternalLinkAlt className="external-icon" />
-              </button>
-
-              {/* Logout Button (Smaller) */}
-              <button className="logout-button" onClick={handleLogout}>
-                Sign out
-              </button>
-            </div>
-          )}
-  </div>
     </div>
   );
 }

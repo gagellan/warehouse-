@@ -10,70 +10,92 @@ const PlanDetail = () => {
   const plan = queryParams.get("plan") || "Basic";
   const billing = queryParams.get("billing") || "monthly";
 
+  // ⭐ FEATURES FOR EACH PLAN (INCLUDING ADVANCED)
+  const features = {
+    Basic: [
+      "🏢 1 Warehouse",
+      "📷 2 Cameras",
+      "📊 Basic Analytics",
+      "🚫 AI Predictions",
+      "🎁 7-day Free Trial",
+      "❌ Cancel Anytime"
+    ],
+    Standard: [
+      "🏢 3 Warehouses",
+      "📷 5 Cameras",
+      "📊 Advanced Analytics",
+      "🚫 AI Predictions"
+    ],
+    Business: [
+      "🏢 10 Warehouses",
+      "📷 15 Cameras",
+      "🤖 AI Predictions Enabled",
+      "🔒 24/7 Monitoring"
+    ],
+    Advanced: [
+      "🏢 20 Warehouses",
+      "📷 30 Cameras",
+      "🤖 AI Predictions Enabled",
+      "📊 Advanced Analytics",
+      "🔒 24/7 Monitoring",
+      "⭐ Priority Support"
+    ]
+  };
+
   return (
     <div style={styles.container}>
-      {/* Left Panel */}
+
+      {/* LEFT PANEL */}
       <div style={styles.leftPanel}>
         <div style={styles.planBox}>
           <h1 style={styles.planTitle}>{plan} Plan</h1>
           <h3 style={styles.billingInfo}>Billing: {billing}</h3>
+
+          {/* ⭐ DYNAMIC FEATURES */}
           <ul style={styles.featureList}>
-            <li>🏢 1 Warehouse</li>
-            <li>📷 2 Cameras</li>
-            <li>📊 Basic Analytics</li>
-            <li>🚫 AI Predictions</li>
-            <li>🎁 7-day Free Trial</li>
-            <li>❌ Cancel Anytime</li>
+            {features[plan].map((item, index) => (
+              <li key={index}>{item}</li>
+            ))}
           </ul>
         </div>
       </div>
 
-      {/* Right Panel */}
+      {/* RIGHT PANEL */}
       <div style={styles.rightPanel}>
         <div style={styles.welcomeBox}>
           <h2 style={styles.heading}>Welcome to Warehouse Pro</h2>
+
           <div style={styles.authRow}>
             <button
               style={styles.loginBtn}
               onClick={() => navigate("/login")}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.backgroundColor = "#0056b3")
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.backgroundColor = "#007bff")
-              }
             >
               Log In
             </button>
+
             <span style={styles.dividerText}>or</span>
+
             <button
               style={styles.signupBtn}
               onClick={() => navigate("/register")}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.backgroundColor = "#1e7e34")
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.backgroundColor = "#28a745")
-              }
             >
               Sign Up
             </button>
           </div>
+
           <p style={styles.message}>
-            🚀 Access your <strong>{plan}</strong> plan with{" "}
-            <strong>{billing}</strong> billing and enjoy your 7-day free trial.
-            No credit card needed. Simple, fast, secure.
+            🚀 You selected the <strong>{plan}</strong> plan with{" "}
+            <strong>{billing}</strong> billing. Get started in minutes!
           </p>
+
           <button
             style={styles.backBtn}
-            onClick={() => navigate("/")}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "#0056b3")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = "#007bff")}
-          >
+            onClick={() => navigate("/")}>
             ← Back to Plans
           </button>
         </div>
       </div>
+
     </div>
   );
 };
@@ -93,8 +115,7 @@ const styles = {
     display: "flex",
     justifyContent: "flex-end",
     alignItems: "center",
-    flex: "0 0 560px", // bigger width
-    height: "auto",
+    flex: "0 0 560px",
     borderTopLeftRadius: 24,
     borderBottomLeftRadius: 24,
   },
@@ -102,15 +123,13 @@ const styles = {
     backgroundColor: "#0a72e8",
     color: "white",
     padding: 50,
+    width: 420,
     borderTopLeftRadius: 24,
     borderBottomLeftRadius: 24,
-    borderTopRightRadius: 0,
-    borderBottomRightRadius: 0,
-    width: 420, // wider box
     boxShadow: "0 8px 24px rgba(0, 0, 0, 0.35)",
   },
   planTitle: {
-    fontSize: 40, // bigger text
+    fontSize: 40,
     marginBottom: 14,
     fontWeight: "700",
   },
@@ -118,7 +137,6 @@ const styles = {
     fontSize: 22,
     marginBottom: 28,
     fontWeight: "600",
-    opacity: 0.95,
   },
   featureList: {
     listStyle: "none",
@@ -130,26 +148,22 @@ const styles = {
   rightPanel: {
     backgroundColor: "white",
     display: "flex",
-    justifyContent: "flex-start",
     alignItems: "center",
-    flex: "0 0 600px", // bigger width
-    height: "auto",
+    flex: "0 0 600px",
     borderTopRightRadius: 24,
     borderBottomRightRadius: 24,
   },
   welcomeBox: {
     backgroundColor: "white",
-    color: "#222",
     padding: 50,
+    width: 420,
+    color: "#222",
     borderTopRightRadius: 24,
     borderBottomRightRadius: 24,
-    borderTopLeftRadius: 0,
-    borderBottomLeftRadius: 0,
-    width: 420, // wider box
     boxShadow: "0 8px 24px rgba(0, 0, 0, 0.15)",
   },
   heading: {
-    fontSize: 36, // bigger text
+    fontSize: 36,
     fontWeight: "700",
     marginBottom: 38,
   },
@@ -160,43 +174,35 @@ const styles = {
   },
   loginBtn: {
     flex: 1,
-    padding: "16px",
+    padding: 16,
     backgroundColor: "#007bff",
-    color: "#fff",
+    color: "white",
     border: "none",
     borderRadius: 12,
-    cursor: "pointer",
     fontSize: 19,
     fontWeight: "700",
-    boxShadow: "0 4px 14px rgba(0,123,255,0.5)",
-    transition: "background-color 0.3s ease, box-shadow 0.3s ease",
+    cursor: "pointer",
   },
   signupBtn: {
     flex: 1,
-    padding: "16px",
+    padding: 16,
     backgroundColor: "#28a745",
-    color: "#fff",
+    color: "white",
     border: "none",
     borderRadius: 12,
-    cursor: "pointer",
     fontSize: 19,
     fontWeight: "700",
-    boxShadow: "0 4px 14px rgba(40,167,69,0.5)",
-    transition: "background-color 0.3s ease, box-shadow 0.3s ease",
+    cursor: "pointer",
   },
   dividerText: {
     fontSize: 20,
     color: "#888",
-    fontWeight: "700",
-    userSelect: "none",
-    alignSelf: "center",
   },
   message: {
     fontSize: 17,
     color: "#555",
     marginTop: 14,
     marginBottom: 32,
-    lineHeight: 1.6,
   },
   backBtn: {
     backgroundColor: "transparent",
@@ -206,8 +212,7 @@ const styles = {
     cursor: "pointer",
     fontSize: 17,
     fontWeight: "700",
-    transition: "color 0.3s ease",
-  },
+  }
 };
 
 export default PlanDetail;

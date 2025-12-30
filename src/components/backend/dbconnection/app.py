@@ -501,7 +501,7 @@ def forgot_password():
         conn.commit()
 
         # Send OTP via email
-        msg = Message("Password Reset OTP", sender=SENDER_EMAIL, recipients=[email])
+        msg = Message("Password Reset OTP", sender="Bikanelite-WM <"+SENDER_EMAIL+">", recipients=[email])
         msg.body = f"Your OTP for password reset is: {otp}. It will expire in 10 minutes."
         mail.send(msg)
 

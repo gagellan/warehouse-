@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 
+=======
+>>>>>>> 22cc376f9930bb9887201f1a364d8678bfa8fb8b
 import random
 from flask import Flask
 from flask_cors import CORS

@@ -11,7 +11,7 @@ from flask_mail import Message
 import os
 
 from email_service import send_activation_email, send_otp_email, send_email
-from database_service import app, current_dir, SENDER_EMAIL, mail, get_db_connection, generate_unique_id, bcrypt
+from database_service import app, current_dir, SENDER_EMAIL, mail, get_db_connection, generate_unique_id, bcrypt,db_config
 
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -477,7 +477,7 @@ def forgot_password():
         return jsonify({"status": "ok"}), 200
     try:
         data = request.json
-        email = data.get("email")
+        email = data.get("email")#get email
 
         if not email:
             return jsonify({"error": "Email is required"}), 400
@@ -492,6 +492,11 @@ def forgot_password():
         if not user:
             return jsonify({"error": "User not found"}), 404
 
+        mobile = user["mobile_number"]#get mobile number
+
+        if not mobile:
+            return jsonify({"error": "Mobile number not found for user"}), 400
+        
         # Generate a 6-digit OTP
         otp = str(random.randint(100000, 999999))
         expire_time = (datetime.now() + timedelta(minutes=10)).strftime("%Y-%m-%d %H:%M:%S")  # OTP expires in 10 minutes
@@ -499,21 +504,56 @@ def forgot_password():
         # Store OTP in RESET_OTP field
         cursor.execute("UPDATE BKLWM_AUTH_USER SET RESET_OTP = %s WHERE EMAIL_ID = %s", (otp, email))
         conn.commit()
-
-        # Send OTP via email
-        msg = Message("Password Reset OTP", sender="Bikanelite-WM <"+SENDER_EMAIL+">", recipients=[email])
-        msg.body = f"Your OTP for password reset is: {otp}. It will expire in 10 minutes."
-        mail.send(msg)
-
         cursor.close()
         conn.close()
 
-        return jsonify({"message": "OTP sent to your email"}), 200
+        #send otp via sms
+        try:
+            smsalert_config = db_config["smsalert"]
+            smsalert_url = "https://www.smsalert.co.in/api/mverify.json"
+            message_text = (
+                "Your verification code for https:[specialchar][specialchar]www.ejaikisan.com is {#var#}"
+                .replace("[specialchar]", "/")
+                .replace("[specialchar]", "/")  # Second slash
+                .replace("{#var#}", otp)
+            )
+            sms_params = {
+                "apikey": smsalert_config["api_key"],
+                "mobile": mobile,
+                "message": message_text,
+                "sender": smsalert_config["sender_id"],
+                "route": smsalert_config["route"]
+            }
 
-    except smtplib.SMTPException as smtp_error:
-        return jsonify({"error": f"SMTP error: {smtp_error}"}), 500
+            print(f" Sending SMS: {message_text} to {mobile}")
+            sms_response = requests.get(smsalert_url, params=sms_params, timeout=10)
+            sms_result = sms_response.json()
+
+            print(f" SMSAlert Response: {sms_result}")
+
+            if sms_result.get("status") != "success":
+                print(f" SMS sent successfully! Job ID: {sms_result.get('jobid')}")
+            else:
+                print(f" SMS failed: {sms_result}")
+
+        except Exception as sms_err:
+            print(f"❌ SMSAlert error: {sms_err}")
+
+
+        # Send OTP via email
+        try:
+            msg = Message("Password Reset OTP", sender="Bikanelite-WM <"+SENDER_EMAIL+">", recipients=[email])
+            msg.body = f"Your OTP for password reset is: {otp}. It will expire in 10 minutes."
+            mail.send(msg)
+            return jsonify({"message": "OTP sent via Email & SMS","channels": ["email", "sms"]}), 20
+        except smtplib.SMTPException as smtp_error:
+            return jsonify({"error": f"SMTP error: {smtp_error}"}), 500
+
     except Exception as e:
+        print(f"❌ Error: {str(e)}")
         return jsonify({"error": str(e)}), 500
+                
+
 
 
 @app.route("/reset-password", methods=["POST"])

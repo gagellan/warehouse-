@@ -4,39 +4,23 @@
   padding: 0;
 }
 
-
 .top-navbar {
   height: 60px;
   position: fixed;
   top: 0;
-  left: 0;
+  left: var(--sidebar-width);
   right: 0;
-  width: 100%;
   z-index: 998;
 }
 
 /* When sidebar collapses */
 .dashboard-layout.collapsed .top-navbar {
-  left: 0;
-  right: 0;
-  width: 100%;
+  left: var(--sidebar-width-collapsed);
 }
 
 /* Push content below the fixed top navbar */
-/* Push content below the fixed top navbar and sidebar */
 .dashboard-content {
-  margin-top: 60px;
-  margin-left: var(--sidebar-width);
-  transition: margin-left 0.3s ease;
-  width: calc(100% - var(--sidebar-width));
-  min-height: calc(100vh - 60px);
-  box-sizing: border-box;
-}
-
-/* When collapsed */
-.dashboard-content.collapsed {
-  margin-left: var(--sidebar-width-collapsed);
-  width: calc(100% - var(--sidebar-width-collapsed));
+  margin-top: 60px !important;
 }
 
 /* Make inner dashboard content full width */
@@ -49,6 +33,20 @@
   margin: 0 !important;
   padding-left: 0 !important;
   padding-right: 0 !important;
+}
+
+
+.dashboard-content {
+  margin-left: var(--sidebar-width);
+  transition: margin-left 0.3s ease;
+}
+
+/* When collapsed */
+.dashboard-content.collapsed {
+  margin-left: var(--sidebar-width-collapsed);
+}
+.dashboard-content {
+  min-height: 100vh;
 }
 
 
@@ -90,11 +88,9 @@
 /* LAYOUT BASE */
 .dashboard-layout {
   display: flex;
-  flex-direction: column;
   width: 100%;
   height: 100vh;
 }
-
 
 /* Sidebar width — CURRENTLY INSIDE NAVBAR */
 .dashboardnav-sidebar {
@@ -106,6 +102,18 @@
 .dashboardnav-sidebar.collapsed {
   width: 70px;
 }
+
+.dashboard-content {
+  margin-left: var(--sidebar-width);
+  transition: margin-left 0.3s ease;
+  width: calc(100% - var(--sidebar-width));
+  min-height: 100vh;
+}
+.dashboard-content.collapsed {
+  margin-left: var(--sidebar-width-collapsed);
+  width: calc(100% - var(--sidebar-width-collapsed));
+}
+
 
 
 /* ---------- FORCE: Content always aligned to mini sidebar ---------- */
@@ -1508,17 +1516,16 @@
 /* ================= DASHBOARD NAVBAR CSS ================= */
 
 .dashboardnav-sidebar {
-  height: calc(100vh - 60px);
+  height: 100vh;
   width: var(--sidebar-width);
   background-color: #1c4e80;
   padding: 20px;
   margin: 0;
   position: fixed;
-  top: 60px;
+  top: 0;
   left: 0;
   z-index: 999;
-  box-shadow: none;
-  border: none;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
   transition: width 0.3s ease, transform 0.3s ease;
   overflow-y: auto;
   display: flex;
@@ -1585,9 +1592,35 @@
   }
 }
 
-/* Sidebar toggle button - HIDDEN (functionality moved to topbar menu-button) */
+/* Sidebar toggle button (hamburger to collapse/expand) */
 .sidebar-toggle-btn {
-  display: none !important;
+  display: none;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 8px 12px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  transition: background-color 0.2s ease;
+  align-self: flex-start;
+  z-index: 1002;
+  position: relative;
+}
+
+@media (min-width: 769px) {
+  .sidebar-toggle-btn {
+    display: block;
+  }
+
+  .sidebar-toggle-btn:hover {
+    background-color: #2b78c4;
+  }
+}
+
+.sidebar-toggle-btn::after {
+  content: none !important;
 }
 
 
@@ -1806,15 +1839,12 @@
   padding: 14px 20px;
   height: var(--navbar-height);
   background-color: #1c4e80;
-  border-bottom: none;
-  border: none;
+  border-bottom: 1px solid #ccc;
   display: flex;
   align-items: center;
   justify-content: space-between;
   position: relative;
   z-index: 100;
-  margin: 0;
-  box-shadow: none;
 }
 
 .dashboardnav-top-navbar h1 {
@@ -2544,7 +2574,7 @@ th {
 .top-navbar {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: center; /* Centers the title */
   background-color: #1c4e80;
   color: white;
   height: var(--navbar-height);
@@ -2552,13 +2582,8 @@ th {
   top: 0;
   left: 0;
   right: 0;
-  width: 100%;
   z-index: 500;
-  box-shadow: none;
-  border: none;
-  border-bottom: none;
-  margin: 0;
-  padding: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 
@@ -2641,26 +2666,10 @@ th {
   border: none;
   cursor: pointer;
   color: white;
-  padding: 8px 12px;
-  border-radius: 5px;
-  transition: background-color 0.2s ease;
-  z-index: 1002;
 }
 
 .menu-button:hover {
   color: #ffb3ba;
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-@media (min-width: 769px) {
-  .menu-button {
-    display: block;
-  }
-
-  .menu-button:hover {
-    background-color: #2b78c4;
-    color: white;
-  }
 }
 
 @media (max-width: 768px) {

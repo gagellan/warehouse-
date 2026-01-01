@@ -1,12 +1,18 @@
 {
-    "user_id": 3,
-    "ip_address": "202.62.85.166",
-    "city": "Hyderabad",
-    "latitude": 17.384,
-    "longitude": 78.4564,
+    "user_id": 5,
+    "ip_address": "2401:4900:1c27:90ed:244f:a78:33a2:3f54",
+    "city": "N\u0101rnaund",
+    "latitude": 29.0736,
+    "longitude": 76.1583,
     "timezone": "Asia/Kolkata",
+<<<<<<< HEAD
     "session_key": "539c409c-3ece-4ac2-9a0e-e8c94ef8d853",
     "expire_date": "2025-12-31T01:02:38.587157",
     "created_date": "2025-12-30T23:02:38.374151",
+=======
+    "session_key": "98b3d827-175d-48e5-ac75-19c2e3e5e2b7",
+    "expire_date": "2025-12-30T19:16:19.043955",
+    "created_date": "2025-12-30T17:16:18.937181",
+>>>>>>> ba38db36fe024b785186a32dbbb4f5a5b6bc63d7
     "is_active": 1
 }

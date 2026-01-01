@@ -186,6 +186,56 @@ def delete_session_file():
     except Exception as e:
         print(f"Error deleting session file: {e}")
 
+# ⭐ NEW: Log authentication events to MySQL
+def log_auth_event(user_id, session_key, action, ip_address, user_agent, reason="manual"):
+    """
+    Log authentication events to BKLWM_AUTH_SESSION_LOG table.
+    
+    Args:
+        user_id: User ID (can be None for failed attempts)
+        session_key: Session key (can be None)
+        action: 'LOGIN', 'LOGOUT', or 'SESSION_EXPIRED'
+        ip_address: Client IP address
+        user_agent: Browser user agent string
+        reason: Reason for the action (e.g., 'manual_login', 'manual_logout', 'session_expired')
+    """
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        logged_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        cursor.execute(
+            """
+            INSERT INTO BKLWM_AUTH_SESSION_LOG (USER_ID, SESSION_KEY, ACTION, IP_ADDRESS, USER_AGENT, LOGGED_AT, REASON)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """,
+            (
+                user_id,
+                session_key,
+                action,
+                ip_address,
+                user_agent[:500] if user_agent else "Unknown",  # Truncate user_agent to reasonable length
+                logged_at,
+                reason
+            )
+        )
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        print(f"✅ Auth event logged: {action} for user {user_id}")
+        
+    except Exception as e:
+        print(f"⚠️ Warning: Could not log auth event to database: {e}")
+        # Don't raise exception - logging failures should not break the flow
+
+# ⭐ NEW: Extract USER_AGENT from request
+def get_user_agent():
+    """Extract USER_AGENT from request headers."""
+    return request.headers.get('User-Agent', 'Unknown')
+
 @app.route("/api/user/status", methods=["GET"])
 def user_status():
     session = read_session_from_file()
@@ -266,6 +316,17 @@ def login():
 
         save_session_to_file(session_data)
 
+        # ⭐ Log successful login to database
+        user_agent = get_user_agent()
+        log_auth_event(
+            user_id=user["ID"],
+            session_key=session_key,
+            action="LOGIN",
+            ip_address=user_ip,
+            user_agent=user_agent,
+            reason="manual_login"
+        )
+
         cursor.close()
         conn.close()
 
@@ -278,6 +339,7 @@ def login():
 
     except Exception as e:
         print(f"Error during login: {e}")
+        return jsonify({"error": str(e)}), 500
         return jsonify({"error": str(e)}), 500
     
 @app.after_request
@@ -429,47 +491,77 @@ def update_password():
 
 @app.route("/logout", methods=["POST"])
 def logout():
+    """
+    Logout endpoint that always succeeds.
+    Logs the logout action to database regardless of session state.
+    """
     try:
         data = request.get_json()
         if not data or "session_key" not in data:
-            return jsonify({"error": "Session key is required"}), 400
+            # Get basic info for logging even without session key
+            user_agent = get_user_agent()
+            ip_address = get_client_ip()
+            log_auth_event(
+                user_id=None,
+                session_key=None,
+                action="LOGOUT",
+                ip_address=ip_address,
+                user_agent=user_agent,
+                reason="no_session_key"
+            )
+            return jsonify({"message": "Logout successful"}), 200
 
         session_key = data["session_key"].strip()
         session_data = read_session_from_file()
+        
+        user_agent = get_user_agent()
+        ip_address = get_client_ip()
+        user_id = None
+        
+        # Try to extract user_id from session data
+        if session_data:
+            user_id = session_data.get("user_id")
 
-        if not session_data or session_data["session_key"] != session_key:
-            return jsonify({"error": "Invalid or expired session"}), 400
+        # ⭐ Log the logout action regardless of session state
+        logout_reason = "manual_logout"
+        if not session_data:
+            logout_reason = "session_expired_or_missing"
+        elif session_data.get("session_key") != session_key:
+            logout_reason = "session_key_mismatch"
 
-        conn = get_db_connection()
-        cursor = conn.cursor()
-
-        cursor.execute(
-            """
-            INSERT INTO BKLWM_SESSION (SESSION_KEY, SESSION_DATA, EXPIRE_DATE, CREATED_DATE, IP_ADDRESS, IS_ACTIVE)
-            VALUES (%s, %s, %s, %s, %s, %s)
-            """,
-            (
-                session_data["session_key"],
-                json.dumps(session_data),
-                session_data["expire_date"],
-                session_data["created_date"],
-                session_data["ip_address"],
-                0
-            )
+        log_auth_event(
+            user_id=user_id,
+            session_key=session_key,
+            action="LOGOUT",
+            ip_address=ip_address,
+            user_agent=user_agent,
+            reason=logout_reason
         )
 
-        conn.commit()
-
+        # Always delete session file if it exists
         delete_session_file()
-
-        cursor.close()
-        conn.close()
 
         return jsonify({"message": "Logout successful"}), 200
 
     except Exception as e:
         print(f"Error during logout: {e}")
-        return jsonify({"error": str(e)}), 500
+        # Log the error but still return success
+        try:
+            user_agent = get_user_agent()
+            ip_address = get_client_ip()
+            log_auth_event(
+                user_id=None,
+                session_key=None,
+                action="LOGOUT",
+                ip_address=ip_address,
+                user_agent=user_agent,
+                reason=f"logout_error: {str(e)[:100]}"
+            )
+        except:
+            pass
+        
+        # Always return success to ensure client-side logout completes
+        return jsonify({"message": "Logout successful"}), 200
 
 @app.route("/forgot-password", methods=["POST", "OPTIONS"])
 def forgot_password():
@@ -504,6 +596,15 @@ def forgot_password():
         # Store OTP in RESET_OTP field
         cursor.execute("UPDATE BKLWM_AUTH_USER SET RESET_OTP = %s WHERE EMAIL_ID = %s", (otp, email))
         conn.commit()
+<<<<<<< HEAD
+=======
+
+        # Send OTP via email
+        msg = Message("Password Reset OTP", sender=SENDER_EMAIL, recipients=[email])
+        msg.body = f"Your OTP for password reset is: {otp}. It will expire in 10 minutes."
+        mail.send(msg)
+
+>>>>>>> ba38db36fe024b785186a32dbbb4f5a5b6bc63d7
         cursor.close()
         conn.close()
 

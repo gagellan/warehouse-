@@ -596,6 +596,15 @@ def forgot_password():
         # Store OTP in RESET_OTP field
         cursor.execute("UPDATE BKLWM_AUTH_USER SET RESET_OTP = %s WHERE EMAIL_ID = %s", (otp, email))
         conn.commit()
+<<<<<<< HEAD
+=======
+
+        # Send OTP via email
+        msg = Message("Password Reset OTP", sender=SENDER_EMAIL, recipients=[email])
+        msg.body = f"Your OTP for password reset is: {otp}. It will expire in 10 minutes."
+        mail.send(msg)
+
+>>>>>>> ba38db36fe024b785186a32dbbb4f5a5b6bc63d7
         cursor.close()
         conn.close()
 

@@ -24,6 +24,7 @@ else:
     raise FileNotFoundError(f"Config file not found at {config_path}")
 
 db_config = config_data["db_config"]
+sms_config = config_data["smsalert"]
 
 SMTP_SERVER = config_data["smtp"]["server"]  
 SMTP_PORT = config_data["smtp"]["port"]

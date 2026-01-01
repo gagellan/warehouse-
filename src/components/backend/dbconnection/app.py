@@ -11,7 +11,7 @@ from flask_mail import Message
 import os
 
 from email_service import send_activation_email, send_otp_email, send_email
-from database_service import app, current_dir, SENDER_EMAIL, mail, get_db_connection, generate_unique_id, bcrypt,db_config
+from database_service import app, current_dir, SENDER_EMAIL, mail, get_db_connection, generate_unique_id, bcrypt,db_config,sms_config
 
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -492,7 +492,7 @@ def forgot_password():
         if not user:
             return jsonify({"error": "User not found"}), 404
 
-        mobile = user["mobile_number"]#get mobile number
+        mobile = user["MOBILE_NUMBER"]#get mobile number
 
         if not mobile:
             return jsonify({"error": "Mobile number not found for user"}), 400
@@ -509,20 +509,16 @@ def forgot_password():
 
         #send otp via sms
         try:
-            smsalert_config = db_config["smsalert"]
-            smsalert_url = "https://www.smsalert.co.in/api/mverify.json"
-            message_text = (
-                "Your verification code for https:[specialchar][specialchar]www.ejaikisan.com is {#var#}"
-                .replace("[specialchar]", "/")
-                .replace("[specialchar]", "/")  # Second slash
-                .replace("{#var#}", otp)
-            )
+            print("sms_config keys:", sms_config.keys())
+            smsalert_url = "https://www.smsalert.co.in/api/push.json"
+            message_text = f"Your verification code for https://www.ejaikisan.com is {otp}."
+            
             sms_params = {
-                "apikey": smsalert_config["api_key"],
-                "mobile": mobile,
-                "message": message_text,
-                "sender": smsalert_config["sender_id"],
-                "route": smsalert_config["route"]
+                "apikey": sms_config["api_key"],
+                "mobileno": mobile,
+                "text": message_text,
+                "sender": sms_config["sender_id"],
+                "route": sms_config["route"]
             }
 
             print(f" Sending SMS: {message_text} to {mobile}")
@@ -531,13 +527,17 @@ def forgot_password():
 
             print(f" SMSAlert Response: {sms_result}")
 
-            if sms_result.get("status") != "success":
-                print(f" SMS sent successfully! Job ID: {sms_result.get('jobid')}")
+            if sms_result.get("status") == "success":
+                desc = sms_result.get("description", {})
+                batch_id = desc.get("batchid")
+                msg_id = desc.get("batch_dtl", [{}])[0].get("msgid")
+
+                print(f" SMS queued successfully | Batch ID: {batch_id} | Msg ID: {msg_id}")
             else:
                 print(f" SMS failed: {sms_result}")
 
         except Exception as sms_err:
-            print(f"❌ SMSAlert error: {sms_err}")
+            print("SMS exception (NOT API):", repr(sms_err))
 
 
         # Send OTP via email

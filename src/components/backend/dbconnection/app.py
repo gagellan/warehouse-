@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 import smtplib
 from flask_mail import Message
 import os
+from email.utils import formataddr
 
 from email_service import send_activation_email, send_otp_email, send_email
 from database_service import app, current_dir, SENDER_EMAIL, mail, get_db_connection, generate_unique_id, bcrypt,db_config,sms_config
@@ -474,7 +475,8 @@ def logout():
 @app.route("/forgot-password", methods=["POST", "OPTIONS"])
 def forgot_password():
     if request.method == "OPTIONS":
-        return jsonify({"status": "ok"}), 200
+        return '', 200
+    
     try:
         data = request.json
         email = data.get("email")#get email
@@ -541,13 +543,7 @@ def forgot_password():
 
 
         # Send OTP via email
-        try:
-            msg = Message("Password Reset OTP", sender="Bikanelite-WM <"+SENDER_EMAIL+">", recipients=[email])
-            msg.body = f"Your OTP for password reset is: {otp}. It will expire in 10 minutes."
-            mail.send(msg)
-            return jsonify({"message": "OTP sent via Email & SMS","channels": ["email", "sms"]}), 20
-        except smtplib.SMTPException as smtp_error:
-            return jsonify({"error": f"SMTP error: {smtp_error}"}), 500
+        return send_otp_email(email, otp)
 
     except Exception as e:
         print(f"❌ Error: {str(e)}")

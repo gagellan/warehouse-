@@ -24,7 +24,7 @@ const PlanPage = () => {
   };
 
   return (
-    <div className="plan-container">
+    <div className="plan-container" id="plans-section">
       <div className="plan-pricing-container">
         <h1>Choose a Subscription Plan</h1>
         <p>Select the best plan for your warehouse monitoring needs.</p>

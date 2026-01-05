@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../../assets/css/App.css";
 
@@ -9,18 +9,6 @@ const PlanDetail = () => {
   const queryParams = new URLSearchParams(location.search);
   const plan = queryParams.get("plan") || "Basic";
   const billing = queryParams.get("billing") || "monthly";
-
-  // ⭐ Handle scroll to plans section when navigating back
-  const handleBackToPlans = () => {
-    navigate("/");
-    // Use setTimeout to ensure navigation completes before scrolling
-    setTimeout(() => {
-      const plansSection = document.getElementById("plans-section");
-      if (plansSection) {
-        plansSection.scrollIntoView({ behavior: "smooth" });
-      }
-    }, 100);
-  };
 
   // ⭐ FEATURES FOR EACH PLAN (INCLUDING ADVANCED)
   const features = {
@@ -102,7 +90,7 @@ const PlanDetail = () => {
 
           <button
             style={styles.backBtn}
-            onClick={handleBackToPlans}>
+            onClick={() => navigate("/")}>
             ← Back to Plans
           </button>
         </div>

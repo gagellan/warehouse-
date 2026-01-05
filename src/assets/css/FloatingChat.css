@@ -5,20 +5,6 @@
     z-index: 1000;
 }
 
-/* Chat Backdrop Overlay - Softer than profile popup for assistive feature */
-.chat-backdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
-    z-index: 999;
-    animation: fadeInSoft 0.25s ease;
-}
-
 .chat-button {
     background-color:  #0056b3;
     color: white;
@@ -58,10 +44,6 @@
     width: 200px;
     text-align: center;
     max-width: calc(100vw - 30px);
-    z-index: 1001;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    animation: slideUpChat 0.25s ease;
 }
 
 .chat-popup h3 {
@@ -174,26 +156,5 @@
         font-size: 0.75rem;
         padding: 6px;
         min-height: 36px;
-    }
-}
-
-/* Animations for chat backdrop and popup */
-@keyframes fadeInSoft {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
-
-@keyframes slideUpChat {
-    from {
-        transform: translateY(10px);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
     }
 }

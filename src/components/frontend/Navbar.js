@@ -58,43 +58,32 @@ function Navbar({ onCollapseChange }) {
   const handleLogout = async () => {
     let sessionKey = localStorage.getItem("session_key");
 
+    if (!sessionKey || sessionKey === "null" || sessionKey === "undefined") {
+      alert("You are already logged out!");
+      window.location.href = "/login";
+      return;
+    }
+
+    sessionKey = sessionKey.trim();
+
     try {
-      // Always attempt to notify backend even if session key is missing
       const response = await fetch("http://127.0.0.1:5000/logout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          session_key: sessionKey || "unknown_session" 
-        }),
+        body: JSON.stringify({ session_key: sessionKey }),
       });
 
-      // Log the response status for debugging
-      console.log("Logout response status:", response.status);
+      const data = await response.json();
 
-      // Don't wait for validation - clear local data regardless
-      // This ensures the user is logged out on the client side
-      localStorage.removeItem("session_key");
-      localStorage.removeItem("userFirstName");
-      localStorage.removeItem("userEmail");
-      
-      // Clear session storage as well
-      sessionStorage.clear();
-
-      // Redirect to login page
-      window.location.href = "/login";
-
+      if (response.ok) {
+        localStorage.removeItem("session_key");
+        localStorage.removeItem("userFirstName");
+        window.location.href = "/login";
+      } else {
+        alert(data.error || "Failed to log out. Please try again.");
+      }
     } catch (error) {
-      // Handle network errors gracefully - still log out on client
-      console.error("Logout error (will still proceed with client logout):", error);
-      
-      // Clear all authentication data
-      localStorage.removeItem("session_key");
-      localStorage.removeItem("userFirstName");
-      localStorage.removeItem("userEmail");
-      sessionStorage.clear();
-
-      // Redirect to login
-      window.location.href = "/login";
+      alert("Something went wrong. Please try again later.");
     }
   };
 
@@ -133,6 +122,11 @@ function Navbar({ onCollapseChange }) {
 
       {/* Sidebar */}
       <div className={`dashboardnav-sidebar ${sideMenuOpen ? 'open' : ''} ${sidebarCollapsed ? 'collapsed' : ''}`}>
+
+        {/* CLEAN HAMBURGER BUTTON */}
+        <button className="sidebar-toggle-btn" onClick={toggleSidebarCollapse}>
+          ☰
+        </button>
 
         {/* Mobile Close Button */}
         <button className="close-button" onClick={() => setSideMenuOpen(false)}>✕</button>
@@ -217,10 +211,7 @@ function Navbar({ onCollapseChange }) {
 
       {/* TOP NAVBAR */}
       <div className="top-navbar">
-        <button className="menu-button" onClick={() => {
-          setSideMenuOpen(prev => !prev);
-          toggleSidebarCollapse();
-        }}>☰</button>
+        <button className="menu-button" onClick={() => setSideMenuOpen(true)}>☰</button>
         <h1>{currentPage}</h1>
 
         <div className="top-navbar-right">
@@ -235,23 +226,17 @@ function Navbar({ onCollapseChange }) {
         </div>
 
         {showEmailBox && (
-          <>
-            <div 
-              className="backdrop-overlay" 
-              onClick={() => setShowEmailBox(false)}
-            />
-            <div className="email-box">
-              <span className="email-text">{email || "No Email"}</span>
+          <div className="email-box">
+            <span className="email-text">{email || "No Email"}</span>
 
-              <button className="view-account" onClick={handleViewAccount}>
-                View account <FaExternalLinkAlt className="external-icon" />
-              </button>
+            <button className="view-account" onClick={handleViewAccount}>
+              View account <FaExternalLinkAlt className="external-icon" />
+            </button>
 
-              <button className="logout-button" onClick={handleLogout}>
-                Sign out
-              </button>
-            </div>
-          </>
+            <button className="logout-button" onClick={handleLogout}>
+              Sign out
+            </button>
+          </div>
         )}
       </div>
 

@@ -15,26 +15,20 @@ const FloatingChat = () => {
         💬
       </div>
 
-      {/* Chat Popup with Backdrop */}
+      {/* Chat Popup */}
       {isOpen && (
-        <>
-          <div 
-            className="chat-backdrop" 
-            onClick={() => setIsOpen(false)}
-          />
-          <div className="chat-popup">
-            <h3>How can we help you?</h3>
-            <button className="chat-option" onClick={() => alert("Contact Sales clicked")}>
-              Chat with Us
-            </button>
-            <button className="chat-option" onClick={() => alert("Get a Demo clicked")}>
-              Get a Demo
-            </button>
-            <button className="chat-option" onClick={() => alert("Free Trial clicked")}>
-              Free Trial
-            </button>
-          </div>
-        </>
+        <div className="chat-popup">
+          <h3>How can we help you?</h3>
+          <button className="chat-option" onClick={() => alert("Contact Sales clicked")}>
+            Chat with Us
+          </button>
+          <button className="chat-option" onClick={() => alert("Get a Demo clicked")}>
+            Get a Demo
+          </button>
+          <button className="chat-option" onClick={() => alert("Free Trial clicked")}>
+            Free Trial
+          </button>
+        </div>
       )}
     </div>
   );

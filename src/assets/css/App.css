@@ -4,28 +4,48 @@
   padding: 0;
 }
 
+
+
 .top-navbar {
   height: 60px;
   position: fixed;
   top: 0;
-  left: var(--sidebar-width);
+  left: 0;
   right: 0;
+  width: 100%;
   z-index: 998;
 }
 
 /* When sidebar collapses */
 .dashboard-layout.collapsed .top-navbar {
-  left: var(--sidebar-width-collapsed);
+  left: 0;
+  right: 0;
+  width: 100%;
 }
 
 /* Push content below the fixed top navbar */
+/* Push content below the fixed top navbar and sidebar */
 .dashboard-content {
-  margin-top: 60px !important;
+  margin-top: 60px;
+  margin-left: var(--sidebar-width);
+  transition: margin-left 0.3s ease;
+  width: calc(100% - var(--sidebar-width));
+  min-height: calc(100vh - 60px);
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 0;
+}
+
+/* When collapsed */
+.dashboard-content.collapsed {
+  margin-left: var(--sidebar-width-collapsed);
+  width: calc(100% - var(--sidebar-width-collapsed));
 }
 
 /* Make inner dashboard content full width */
 .dashboard-section,
-.dashboard,
 .page-container,
 .content-body {
   width: 100% !important;
@@ -33,20 +53,6 @@
   margin: 0 !important;
   padding-left: 0 !important;
   padding-right: 0 !important;
-}
-
-
-.dashboard-content {
-  margin-left: var(--sidebar-width);
-  transition: margin-left 0.3s ease;
-}
-
-/* When collapsed */
-.dashboard-content.collapsed {
-  margin-left: var(--sidebar-width-collapsed);
-}
-.dashboard-content {
-  min-height: 100vh;
 }
 
 
@@ -88,9 +94,11 @@
 /* LAYOUT BASE */
 .dashboard-layout {
   display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100vh;
 }
+
 
 /* Sidebar width — CURRENTLY INSIDE NAVBAR */
 .dashboardnav-sidebar {
@@ -102,18 +110,6 @@
 .dashboardnav-sidebar.collapsed {
   width: 70px;
 }
-
-.dashboard-content {
-  margin-left: var(--sidebar-width);
-  transition: margin-left 0.3s ease;
-  width: calc(100% - var(--sidebar-width));
-  min-height: 100vh;
-}
-.dashboard-content.collapsed {
-  margin-left: var(--sidebar-width-collapsed);
-  width: calc(100% - var(--sidebar-width-collapsed));
-}
-
 
 
 /* ---------- FORCE: Content always aligned to mini sidebar ---------- */
@@ -1516,16 +1512,17 @@
 /* ================= DASHBOARD NAVBAR CSS ================= */
 
 .dashboardnav-sidebar {
-  height: 100vh;
+  height: calc(100vh - 60px);
   width: var(--sidebar-width);
   background-color: #1c4e80;
   padding: 20px;
   margin: 0;
   position: fixed;
-  top: 0;
+  top: 60px;
   left: 0;
   z-index: 999;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+  box-shadow: none;
+  border: none;
   transition: width 0.3s ease, transform 0.3s ease;
   overflow-y: auto;
   display: flex;
@@ -1592,35 +1589,9 @@
   }
 }
 
-/* Sidebar toggle button (hamburger to collapse/expand) */
+/* Sidebar toggle button - HIDDEN (functionality moved to topbar menu-button) */
 .sidebar-toggle-btn {
-  display: none;
-  background: none;
-  border: none;
-  color: white;
-  font-size: 24px;
-  cursor: pointer;
-  padding: 8px 12px;
-  margin-bottom: 20px;
-  border-radius: 5px;
-  transition: background-color 0.2s ease;
-  align-self: flex-start;
-  z-index: 1002;
-  position: relative;
-}
-
-@media (min-width: 769px) {
-  .sidebar-toggle-btn {
-    display: block;
-  }
-
-  .sidebar-toggle-btn:hover {
-    background-color: #2b78c4;
-  }
-}
-
-.sidebar-toggle-btn::after {
-  content: none !important;
+  display: none !important;
 }
 
 
@@ -1839,12 +1810,15 @@
   padding: 14px 20px;
   height: var(--navbar-height);
   background-color: #1c4e80;
-  border-bottom: 1px solid #ccc;
+  border-bottom: none;
+  border: none;
   display: flex;
   align-items: center;
   justify-content: space-between;
   position: relative;
   z-index: 100;
+  margin: 0;
+  box-shadow: none;
 }
 
 .dashboardnav-top-navbar h1 {
@@ -1875,43 +1849,45 @@
 /* ================= DASHBOARD PAGE CSS ================= */
 
 .dashboard {
-  padding: 20px;
   width: 100%;
+  max-width: 1400px;
   box-sizing: border-box;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: var(--gap);
+  padding: 30px 20px;
 }
 
 
 /* Collapsed sidebar - adjust dashboard margin */
 .dashboardnav-sidebar.collapsed ~ .dashboard,
 .dashboard.with-collapsed-sidebar {
-  margin-left: var(--sidebar-width-collapsed);
-  max-width: calc(100% - var(--sidebar-width-collapsed));
+  max-width: 1400px;
 }
 
 @media (max-width: 768px) {
   .dashboard {
     max-width: 100%;
-    padding: var(--container-padding);
+    padding: 20px var(--container-padding);
   }
 
   .dashboard.with-collapsed-sidebar {
-    margin-left: 0;
     max-width: 100%;
   }
 }
 
 @media (max-width: 480px) {
   .dashboard {
-    padding: 8px;
+    padding: 15px var(--container-padding);
   }
 }
 
 .cards {
-  display: flex;
-  flex-wrap: wrap;
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
   gap: var(--gap);
-  margin-bottom: 30px;
-  justify-content: center;
+  margin-bottom: 0;
 }
 
 .card {
@@ -1919,9 +1895,7 @@
   border-radius: 10px;
   padding: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  flex: 1;
-  min-width: 150px;
-  max-width: 200px;
+  grid-column: span 3;
   height: 150px;
   text-align: center;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -1954,8 +1928,7 @@
 
 @media (max-width: 768px) {
   .card {
-    min-width: 120px;
-    max-width: 160px;
+    grid-column: span 6;
     height: auto;
     padding: 15px;
   }
@@ -1973,32 +1946,39 @@
 
 @media (max-width: 480px) {
   .card {
-    min-width: calc(50% - 6px);
-    max-width: calc(50% - 6px);
+    grid-column: span 12;
   }
 
   .cards {
     gap: 8px;
-    margin-bottom: 15px;
   }
 }
 
 .charts {
-  margin-top: 40px;
-  display: flex;
-  gap: 30px;
-  justify-content: center;
-  flex-wrap: wrap;
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: var(--gap);
+  margin-top: 0;
 }
 
 .chart-container {
-  flex: 1;
+  grid-column: span 6;
   background: white;
   border-radius: 10px;
   padding: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  min-width: 280px;
-  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.chart-container canvas {
+  width: 100% !important;
+  height: auto !important;
+  display: block;
+  max-width: 100%;
 }
 
 .chart-container h2 {
@@ -2010,11 +1990,10 @@
 @media (max-width: 768px) {
   .charts {
     gap: 15px;
-    margin-top: 20px;
   }
 
   .chart-container {
-    min-width: 100%;
+    grid-column: span 12;
     padding: 15px;
   }
 
@@ -2574,7 +2553,7 @@ th {
 .top-navbar {
   display: flex;
   align-items: center;
-  justify-content: center; /* Centers the title */
+  justify-content: center;
   background-color: #1c4e80;
   color: white;
   height: var(--navbar-height);
@@ -2582,8 +2561,13 @@ th {
   top: 0;
   left: 0;
   right: 0;
+  width: 100%;
   z-index: 500;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: none;
+  border: none;
+  border-bottom: none;
+  margin: 0;
+  padding: 0;
 }
 
 
@@ -2666,10 +2650,26 @@ th {
   border: none;
   cursor: pointer;
   color: white;
+  padding: 8px 12px;
+  border-radius: 5px;
+  transition: background-color 0.2s ease;
+  z-index: 1002;
 }
 
 .menu-button:hover {
   color: #ffb3ba;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+@media (min-width: 769px) {
+  .menu-button {
+    display: block;
+  }
+
+  .menu-button:hover {
+    background-color: #2b78c4;
+    color: white;
+  }
 }
 
 @media (max-width: 768px) {
@@ -2766,6 +2766,21 @@ th {
 .edit-account-button:hover {
   background-color: #0056b3;
 } */
+
+/* Backdrop overlay for profile popup */
+.backdrop-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 1050;
+  animation: fadeIn 0.3s ease;
+}
+
 .email-box {
   position: absolute;
   top: calc(100% + 10px);
@@ -2774,13 +2789,15 @@ th {
   padding: 20px;
   border-radius: 12px;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
-  z-index: 1100;
+  z-index: 1101;
   width: 320px;
   font-family: "Arial", sans-serif;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   animation: slideDown 0.3s ease;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 @keyframes slideDown {
@@ -2790,6 +2807,15 @@ th {
   }
   to {
     transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
     opacity: 1;
   }
 }
@@ -2878,7 +2904,7 @@ th {
     right: 0;
     width: 100%;
     border-radius: 12px 12px 0 0;
-    z-index: 1100;
+    z-index: 1101;
   }
 
   .email-text {

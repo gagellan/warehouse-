@@ -9,7 +9,6 @@ from datetime import datetime, timedelta
 import smtplib
 from flask_mail import Message
 import os
-from email.utils import formataddr
 
 from email_service import send_activation_email, send_otp_email, send_email
 from database_service import app, current_dir, SENDER_EMAIL, mail, get_db_connection, generate_unique_id, bcrypt,db_config,sms_config
@@ -251,6 +250,14 @@ def login():
         cursor.execute("UPDATE BKLWM_AUTH_USER SET LAST_LOGIN = %s WHERE EMAIL_ID = %s", (last_login_time, email))
         conn.commit()
 
+        # Mark user as ACTIVE after successful login
+        cursor.execute(
+            "UPDATE BKLWM_AUTH_USER SET IS_USER_ACTIVE = 1 WHERE EMAIL_ID = %s",
+            (email,)
+        )
+        conn.commit()   
+
+        
         session_key = str(uuid.uuid4())
         session_data = {
             "user_id": user["ID"],
@@ -441,6 +448,16 @@ def logout():
         if not session_data or session_data["session_key"] != session_key:
             return jsonify({"error": "Invalid or expired session"}), 400
 
+        # Mark user as INACTIVE on logout
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute(
+    "UPDATE BKLWM_AUTH_USER SET IS_USER_ACTIVE = 0 WHERE ID = %s",
+    (session_data["user_id"],)
+)
+        conn.commit()
+
         conn = get_db_connection()
         cursor = conn.cursor()
 
@@ -475,8 +492,7 @@ def logout():
 @app.route("/forgot-password", methods=["POST", "OPTIONS"])
 def forgot_password():
     if request.method == "OPTIONS":
-        return '', 200
-    
+        return jsonify({"status": "ok"}), 200
     try:
         data = request.json
         email = data.get("email")#get email
@@ -543,7 +559,13 @@ def forgot_password():
 
 
         # Send OTP via email
-        return send_otp_email(email, otp)
+        try:
+            msg = Message("Password Reset OTP", sender="Bikanelite-WM <"+SENDER_EMAIL+">", recipients=[email])
+            msg.body = f"Your OTP for password reset is: {otp}. It will expire in 10 minutes."
+            mail.send(msg)
+            return jsonify({"message": "OTP sent via Email & SMS","channels": ["email", "sms"]}), 20
+        except smtplib.SMTPException as smtp_error:
+            return jsonify({"error": f"SMTP error: {smtp_error}"}), 500
 
     except Exception as e:
         print(f"❌ Error: {str(e)}")

@@ -422,7 +422,7 @@ def forgot_password():
         try:
             print("sms_config keys:", sms_config.keys())
             smsalert_url = "https://www.smsalert.co.in/api/push.json"
-            message_text = f"Your verification code for https://www.ejaikisan.com is {otp}."
+            message_text = f"Your OTP for Gagellan products is {otp}. It will expire in 5 minutes. Please do not share."
             
             sms_params = {
                 "apikey": sms_config["api_key"],

@@ -410,10 +410,10 @@ def forgot_password():
         
         # Generate a 6-digit OTP
         otp = str(random.randint(100000, 999999))
-        expire_time = (datetime.now() + timedelta(minutes=10)).strftime("%Y-%m-%d %H:%M:%S")  # OTP expires in 10 minutes
+        expire_time = (datetime.now() + timedelta(minutes=5)).strftime("%Y-%m-%d %H:%M:%S")  # OTP expires in 5 minutes
 
         # Store OTP in RESET_OTP field
-        cursor.execute("UPDATE BKLWM_AUTH_USER SET RESET_OTP = %s WHERE EMAIL_ID = %s", (otp, email))
+        cursor.execute("UPDATE BKLWM_AUTH_USER SET RESET_OTP = %s, OTP_EXPIRE_TIME = %s WHERE EMAIL_ID = %s", (otp, expire_time, email))
         conn.commit()
         cursor.close()
         conn.close()
@@ -486,6 +486,9 @@ def reset_password():
 
         if not user or str(user["RESET_OTP"]) != str(otp):
             return jsonify({"error": "Invalid OTP"}), 400
+        
+        if datetime.now() > user["OTP_EXPIRE_TIME"]:
+            return jsonify({"error": "OTP expired"}), 400
 
         # Hash new password
         hashed_password = bcrypt.generate_password_hash(new_password).decode("utf-8")

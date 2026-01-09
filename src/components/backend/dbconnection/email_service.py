@@ -38,7 +38,7 @@ def send_otp_email(email, otp):
 
             msg.body = f"""
             Your OTP for password reset is: {otp}
-            This OTP will expire in 10 minutes.
+            This OTP will expire in 5 minutes.
             If you did not request this, please ignore this email."""
 
             msg.html = f"""<!DOCTYPE html>
@@ -116,7 +116,7 @@ def send_otp_email(email, otp):
             </div>
 
             <div class="warning">
-              If you didn’t request this, please ignore this email.
+              If you didn't request this, please ignore this email.
             </div>
 
             <div class="footer">

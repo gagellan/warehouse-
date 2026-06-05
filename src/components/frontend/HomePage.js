@@ -16,10 +16,18 @@ function HomePage() {
 
           {/* Centered Navbar Links */}
           <div className="navbar-links">
-            <Link to="/" className="navbar-link">About Us</Link>
-            <Link to="/" className="navbar-link">Partners</Link>
-            <Link to="/" className="navbar-link">Products</Link>
-            <Link to="/" className="navbar-link">Solutions</Link>
+            <a 
+  href="https://www.gagellan.com/About/AboutUs.php" 
+  className="navbar-link" 
+  target="_blank" 
+  rel="noopener noreferrer"
+>
+  ABOUT US
+</a>
+
+            <Link to="/" className="navbar-link">PARTNERS</Link>
+            <Link to="/" className="navbar-link">PRODUCTS</Link>
+            <Link to="/" className="navbar-link">SOLUTIONS</Link>
           </div>
 
           {/* Login Link at End */}

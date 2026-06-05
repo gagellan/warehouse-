@@ -1,21 +1,24 @@
 {
     "db_config": {
-        "host": "162.241.116.193",
-        "user": "ejaik1cd_bikanelite_dev",
-        "password": "Isha#1234567",
-        "database": "ejaik1cd_bikanelite_dev"
+        "host": "184.168.107.47",
+        "user": "bikanelitewmdev",
+        "password": "iM9NEiItJ0p%",
+        "database": "bikanelitewm"
     },
     
     "smtp": {
-        "server": "mail.ejaikisan.com",
+        "server": "mail.aigagellan.com",
         "port": 465,
-        "sender_email": "account.security@ejaikisan.com",
-        "sender_password": "Hn2{uxk%KP_e"
+        "sender_email": "registration-wm@aigagellan.com",
+        "sender_password": "^n507Q>9D@-f"
         },
     "email_template": {
         "subject": "Activate Your Account",
         "body": "<html><body><h2>Welcome to BIKANELTES!</h2><p>Click below to activate your account:</p><form action='{activation_link}' method='GET'><button type='submit' style='background-color: blue; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer;'>Activate Account</button></form></body></html>"
-        }
-    
-    
+        },
+    "smsalert": {
+        "api_key": "695505faf0df4",
+        "sender_id": "GAGELN",
+        "route": "Transactional"
+    }
 }
